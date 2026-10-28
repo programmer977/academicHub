@@ -20,5 +20,16 @@ export const up =(pgm: MigrationBuilder)=>{
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             UNIQUE (user_id, name)
         )
+        CREATE INDEX subjects_user_id_idx ON subjects(user_id);
+
+        CREATE TABLE activies(
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            subject_id UUID NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            description TEXT,
+            status TEXT NOT NULL DEFAULT 'pending' CHECK(status in('pending','in_progress','completed')),
+            due_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
     `)
 } 

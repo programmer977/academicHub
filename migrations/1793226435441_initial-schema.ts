@@ -31,5 +31,20 @@ export const up =(pgm: MigrationBuilder)=>{
             due_at TIMESTAMPTZ NOT NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
+        CREATE INDEX activities_subject_id_idx ON activities(subject_id);
+        CREATE INDEX activities_due_at_idx ON activities(due_at);
+
+        CREATE TABLE assessments(
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            subject_id UUID NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            grade NUMERIC(4,2) CHECK (grade BETWEEN 0 AND 10);
+            weight INTEGER NOT NULL DEFAULT 1
+            CHECK (weight BETWEEN 1 AND 10),
+            due_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+        CREATE INDEX assessments_subject_id_idx ON assessments(subject_id);
+        CREATE INDEX assessments_due_at_idx ON assessments(due_at);
     `)
-} 
+};

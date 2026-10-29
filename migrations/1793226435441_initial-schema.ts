@@ -48,3 +48,12 @@ export const up =(pgm: MigrationBuilder)=>{
         CREATE INDEX assessments_due_at_idx ON assessments(due_at);
     `)
 };
+
+export const down = (pgm: MigrationBuilder) => {
+  pgm.sql(`
+    DROP TABLE IF EXISTS assessments;
+    DROP TABLE IF EXISTS activities;
+    DROP TABLE IF EXISTS subjects;
+    DROP TABLE IF EXISTS users;
+  `);
+};

@@ -1,5 +1,4 @@
 import {z} from "zod";
-import { hashPassword } from "./password.js";
 
 export const registerSchema = z.object({
     name:z.string().min(2).max(100),

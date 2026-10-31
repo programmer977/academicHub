@@ -20,7 +20,7 @@ export function buildApp(option:appOption){
         sign:{
             expiresIn : "15m"
         }
-    })
+    });
     app.register(fastifySwagger, {
         openapi:{
             info:{
@@ -30,5 +30,8 @@ export function buildApp(option:appOption){
             }
         },
         transform : jsonSchemaTransform
-    })
+    });
+    app.register(fastifySwaggerUi, {
+        routePrefix: "/docs"
+    });
 }

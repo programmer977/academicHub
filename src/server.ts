@@ -14,5 +14,6 @@ async function start(){
         await app.close();
         await pool.end();
     }
+    
 }
 await start();

@@ -34,4 +34,5 @@ export function buildApp(option:appOption){
     app.register(fastifySwaggerUi, {
         routePrefix: "/docs"
     });
+    return app;
 }

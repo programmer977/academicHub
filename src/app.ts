@@ -34,5 +34,12 @@ export function buildApp(option:appOption){
     app.register(fastifySwaggerUi, {
         routePrefix: "/docs"
     });
+
+    app.setErrorHandler((error,request,reply)=>{
+        const databaseCode = typeof error === "object" && error !== null && "code" in error ? error.code:undefined;
+    })
+
+
+
     return app;
 }

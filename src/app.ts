@@ -34,6 +34,9 @@ export function buildApp(option:appOption){
     app.register(fastifySwaggerUi, {
         routePrefix: "/docs"
     });
+    app.register(authRoutes(option.pool), {
+    prefix: "/api/v1/auth"
+    });
 
     app.setErrorHandler((error,request,reply)=>{
         const err = error as any;

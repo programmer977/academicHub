@@ -36,10 +36,19 @@ export function buildApp(option:appOption){
     });
 
     app.setErrorHandler((error,request,reply)=>{
+        const err = error as any;
         const databaseCode = typeof error === "object" && error !== null && "code" in error ? error.code:undefined;
         if(databaseCode==="23505"){
             return reply.code(409).send({message:"Recourse already exists"});
         }
+        if(err.statusCode===400){
+            return reply.code(400).send({message:"invalid request data"});
+        }
+        if(err.statusCode && err.statusCode >= 400 && err.statusCode < 500){
+            return reply.code(err.statusCode).send({message:"request could not be processed"});
+        }
+        request.log.error(err);
+        return reply.code(500).send({message:"internal server error"});
     })
 
 

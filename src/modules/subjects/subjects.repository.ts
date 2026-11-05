@@ -5,3 +5,11 @@ export type subject = {
     name:string,
     description:string|null,
 }
+
+export class subjectRepository{
+    constructor(readonly pool : Pool){};
+}
+
+async findAllByUser(userId:string):Promise<subject[]>{
+    
+}

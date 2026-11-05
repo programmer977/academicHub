@@ -7,9 +7,10 @@ export type subject = {
 }
 
 export class subjectRepository{
-    constructor(readonly pool : Pool){};
-}
+    constructor(private readonly pool : Pool){};
 
-async findAllByUser(userId:string):Promise<subject[]>{
-    
+    async findAllByUser(userId:string):Promise<subject[]>{
+    const result = await this.pool.query(`SELECT id,name,description FROM subjects WHERE user_id=$1 ORDER BY name ASC`,[userId]);
+    return result.rows;
 }
+};

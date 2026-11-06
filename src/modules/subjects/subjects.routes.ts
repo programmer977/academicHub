@@ -25,14 +25,16 @@ export function subjectRoutes(pool:Pool){
     routes.post("/subjects",{
         onRequest:[requireAuth],
         schema:{
-            body:createSubjectSchema
-        },response:{
-            201:subjectResponseSchema
-            }
+            body:createSubjectSchema,
+            response:{
+                201:subjectResponseSchema
+                }
+        }
         },async (request,reply)=>{
             const{name,description}=request.body;
-        }const subject = service.createSubject(request.user.sub,name,description??null);
-        return reply.code(201).send(subject);
+            const subject = await service.createSubject(request.user.sub,name,description??null);
+            return reply.code(201).send(subject);
+        }
     ); 
     }
 }

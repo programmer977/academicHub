@@ -6,6 +6,7 @@ import { validatorCompiler, serializerCompiler, jsonSchemaTransform } from "fast
 import { Pool } from 'pg';
 import { authRoutes } from './modules/auth/auth.rotes.js';
 import { appendFile } from 'node:fs';
+import { subjectRoutes } from './modules/subjects/subjects.routes.js';
 
 type appOption = {pool:Pool,jwtSecret:string};
 
@@ -36,6 +37,9 @@ export function buildApp(option:appOption){
     });
     app.register(authRoutes(option.pool), {
     prefix: "/api/v1/auth"
+    });
+    app.register(subjectRoutes(option.pool),{
+        prefix:"/api/v1"
     });
 
     app.setErrorHandler((error,request,reply)=>{

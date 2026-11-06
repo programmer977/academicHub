@@ -14,7 +14,7 @@ export class subjectRepository{
     return result.rows;
 }
     async create(userId:string,name:string,description:string|null):Promise<subject>{
-    const result = await this.pool.query(`INSERT INTO subjects(user_id,name,description) VALUES $1,$2,$3 RETURNING id,name,description`,[userId,name,description]);
+    const result = await this.pool.query(`INSERT INTO subjects(user_id,name,description) VALUES ($1,$2,$3) RETURNING id,name,description`,[userId,name,description]);
     const subject = result.rows[0];
     if(!subject){
         throw new Error("subject creation failed");

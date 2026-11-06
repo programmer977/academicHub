@@ -8,7 +8,7 @@ export const updateSubjectSchema = createSubjectSchema.partial().refine(
     (data)=>Object.keys(data).length>0,{message:"Provide at least one field"}
 );
 export const subjectParamsSchema = z.object({id:z.uuid()});
-export const subjetResponseSchema = z.object({
+export const subjectResponseSchema = z.object({
     id:z.uuid(),
     name:z.string(),
     description:z.string().nullable(),

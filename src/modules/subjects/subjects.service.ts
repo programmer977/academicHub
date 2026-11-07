@@ -13,4 +13,7 @@ export class subjectService{
     async updateSubject(userId:string,subjectId:string,data:{name?:string | null | undefined,description?:string | null | undefined}){
         return this.repository.update(userId,subjectId,data);
     }
+    async deleteSubject(userId:string,subjectId:string){
+        return this.repository.delete(userId,subjectId);
+    }
 }

@@ -43,7 +43,8 @@ export function subjectRoutes(pool:Pool){
                 body:updateSubjectSchema,
                 params:subjectParamsSchema,
                 response:{
-                    200:subjectResponseSchema
+                    200:subjectResponseSchema,
+                    404:subjectResponseSchema,
                 }
             }
         },async (request,reply)=>{
@@ -51,7 +52,7 @@ export function subjectRoutes(pool:Pool){
             const {name,description}=request.body as {name?:string,description?:string};
             const updated = await service.updateSubject(request.user.sub,id,{name,description});
             if(!updated){
-                return;
+                return reply.code(404);
             }
             return reply.code(200).send(updated);
         }
@@ -60,17 +61,14 @@ export function subjectRoutes(pool:Pool){
         onRequest:[requireAuth],
         schema:{
             params:subjectParamsSchema,
-            response:{
-                200:subjectResponseSchema,
-            }
         }
     },async(request,reply)=>{
         const {id} = request.params as {id:string};
         const deleted = await service.deleteSubject(request.user.sub,id);
         if(!deleted){
-            return
+            return reply.code(404).send({message: "Subject not found"})
         }
-        return reply.code(200).send(deleted);
+        return reply.code(200).send();
     }
 )
     }

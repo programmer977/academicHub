@@ -25,14 +25,11 @@ export class subjectRepository{
         const result = await this.pool.query(`UPDATE subjects SET name = CASE WHEN $1::boolean THEN $2 ELSE name END, description = CASE WHEN $3::boolean THEN $4 ELSE description END WHERE id = $5 AND user_id = $6 RETURNING id, name, description`,[data.name !== undefined,data.name,data.description !== undefined,data.description,subjectId,userId]);
         const subject = result.rows[0];
         if(!subject){
-            throw new Error("subject update failed");
+            return null;
         } return subject;
     }
-    async delete(userId:string,subjectId:string){
+    async delete(userId:string,subjectId:string):Promise<boolean>{
         const result = await this.pool.query(`DELETE FROM subjects WHERE id = $1 AND user_id = $2 RETURNING id`,[subjectId,userId]);
-        if(!result){
-            return;
-        }
-        return result.rows[0];
+        return result.rows.length>0;
     }
 };

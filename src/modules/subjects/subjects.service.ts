@@ -1,3 +1,4 @@
+import { DeserializeOptions } from "node:sqlite";
 import { subjectRepository } from "./subjects.repository.js";
 
 export class subjectService{
@@ -8,5 +9,8 @@ export class subjectService{
     };
     async createSubject(userId:string,name:string,description:string|null){
         return this.repository.create(userId,name,description);
+    }
+    async updateSubject(userId:string,subjectId:string,data:{name?:string|null,description?:string|null}){
+        return this.repository.update(userId,subjectId,data);
     }
 }

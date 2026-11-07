@@ -33,6 +33,6 @@ export class subjectRepository{
         if(!result){
             return;
         }
-        return result;
+        return result.rows[0];
     }
 };

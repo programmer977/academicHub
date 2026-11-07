@@ -5,6 +5,7 @@ import { requireAuth } from "../auth/auth.guard.js";
 import { createSubjectSchema,subjectParamsSchema,subjectResponseSchema,updateSubjectSchema } from "./subjects.schemas.js";
 import { subjectRepository } from "./subjects.repository.js";
 import { subjectService } from "./subjects.service.js";
+import { request } from "node:http";
 
 export function subjectRoutes(pool:Pool){
     return async function(app:FastifyInstance){
@@ -54,6 +55,23 @@ export function subjectRoutes(pool:Pool){
             }
             return reply.code(200).send(updated);
         }
-    )
+    );
+    routes.delete("/subjects/:id",{
+        onRequest:[requireAuth],
+        schema:{
+            params:subjectParamsSchema,
+            response:{
+                200:subjectResponseSchema,
+            }
+        }
+    },async(request,reply)=>{
+        const {id} = request.params as {id:string};
+        const deleted = await service.deleteSubject(request.user.sub,id);
+        if(!deleted){
+            return
+        }
+        return reply.code(200).send(deleted);
+    }
+)
     }
 }

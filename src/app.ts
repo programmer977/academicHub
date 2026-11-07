@@ -5,7 +5,6 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 import { validatorCompiler, serializerCompiler, jsonSchemaTransform } from "fastify-type-provider-zod";
 import { Pool } from 'pg';
 import { authRoutes } from './modules/auth/auth.rotes.js';
-import { appendFile } from 'node:fs';
 import { subjectRoutes } from './modules/subjects/subjects.routes.js';
 
 type appOption = {pool:Pool,jwtSecret:string};

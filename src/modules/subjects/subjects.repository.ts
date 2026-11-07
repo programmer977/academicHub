@@ -28,8 +28,8 @@ export class subjectRepository{
             throw new Error("subject update failed");
         } return subject;
     }
-    async delete(subjectId:string,userId:string){
-        const result = await this.pool.query(`DELETE FROM subjects WHERE id = $1 AND user_id = $2 RETURNIND id`,[subjectId,userId]);
+    async delete(userId:string,subjectId:string){
+        const result = await this.pool.query(`DELETE FROM subjects WHERE id = $1 AND user_id = $2 RETURNING id`,[subjectId,userId]);
         if(!result){
             return;
         }

@@ -60,7 +60,7 @@ The database is available at 127.0.0.1:5433 on the host; the container uses port
 
 Ensure DATABASE_URL is available to the migration CLI. Using the example development credentials:
 DATABASE_URL="postgresql://academichub:devPass@127.0.0.1:5433/academichub" npm run migrate -- up
-5. Start the API
+### 5. Start the API
 npm run dev
 
     API base URL: http://localhost:3000/api/v1
@@ -146,7 +146,7 @@ activities	Tasks, status, and deadlines per subject	Database schema only
 assessments	Grades, weights, and deadlines per subject	Database schema only
 
 The database includes a UNIQUE (user_id, name) constraint for subjects. Activities and assessments have foreign keys to subjects with ON DELETE CASCADE; removing a subject also removes related rows.
-Architecture
+### Architecture
 academicHub/
 ├── compose.yaml
 ├── migrations/
@@ -195,7 +195,7 @@ Current Limitations
     Automated tests: test scripts reference files that are not in the repository.
     Production readiness: error handling, test coverage, and security configuration require further work.
 
-Roadmap
+### Roadmap
 
     Fix subject update/delete behaviors and standardize HTTP errors.
     Add integration tests for authentication and user-level data isolation.
@@ -203,7 +203,7 @@ Roadmap
     Implement assessment management and weighted grade calculations.
     Build the frontend, dashboards, and academic overview.
 
-Repository
+### Repository
 
 Developed by
 programmer977 as an ongoing learning project.

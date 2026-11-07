@@ -49,6 +49,9 @@ export function subjectRoutes(pool:Pool){
             const {id} = request.params as {id:string};
             const {name,description}=request.body as {name?:string,description?:string};
             const updated = await service.updateSubject(request.user.sub,id,{name,description});
+            if(!updated){
+                return;
+            }
             return reply.code(200).send(updated);
         }
     )

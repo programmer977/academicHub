@@ -22,7 +22,7 @@ export class subjectRepository{
     } return subject;
 }
     async update(userId:string,subjectId:string,data:{name?:string | null | undefined,description?:string | null | undefined}):Promise<subject|null>{
-        const result = await this.pool.query(`UPDATE subjects SET name = COALESCE($1, name), description = CASE WHEN $2::boolean THEN $3 ELSE description END WHERE id = $4 AND user_id = $5 RETURNING id, name, description`,[data.name !== undefined,data.description !== undefined,data.description,subjectId,userId]);
+        const result = await this.pool.query(`UPDATE subjects SET name = CASE WHEN $1::boolean THEN $2 ELSE name END, description = CASE WHEN $3::boolean THEN $4 ELSE description END WHERE id = $5 AND user_id = $6 RETURNING id, name, description`,[data.name !== undefined,data.name,data.description !== undefined,data.description,subjectId,userId]);
         const subject = result.rows[0];
         if(!subject){
             throw new Error("subject update failed");

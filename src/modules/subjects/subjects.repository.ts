@@ -21,7 +21,7 @@ export class subjectRepository{
         throw new Error("subject creation failed");
     } return subject;
 }
-    async update(userId:string,subjectId:string,data:{name?:string|null,description?:string|null}):Promise<subject|null>{
+    async update(userId:string,subjectId:string,data:{name?:string | null | undefined,description?:string | null | undefined}):Promise<subject|null>{
         const result = await this.pool.query(`UPDATE subjects SET name = COALESCE($1, name), description = CASE WHEN $2::boolean THEN $3 ELSE description END WHERE id = $4 AND user_id = $5 RETURNING id, name, description`,[data.name!==undefined,data.name,data.description!==undefined,subjectId,userId]);
         const subject = result.rows[0];
         if(!subject){

@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
-import { createSubjectSchema,subjectResponseSchema,updateSubjectSchema } from "./subjects.schemas.js";
+import { createSubjectSchema,subjectParamsSchema,subjectResponseSchema,updateSubjectSchema } from "./subjects.schemas.js";
 import { subjectRepository } from "./subjects.repository.js";
 import { subjectService } from "./subjects.service.js";
 
@@ -36,5 +36,21 @@ export function subjectRoutes(pool:Pool){
             return reply.code(201).send(subject);
         }
     ); 
+        routes.patch("/subjects/:id",{
+            onRequest:[requireAuth],
+            schema:{
+                body:updateSubjectSchema,
+                params:subjectParamsSchema,
+                response:{
+                    200:subjectResponseSchema
+                }
+            }
+        },async (request,reply)=>{
+            const {id} = request.params as {id:string};
+            const {name,description}=request.body as {name?:string,description?:string};
+            const updated = await service.updateSubject(request.user.sub,id,{name,description});
+            return reply.code(200).send(updated);
+        }
+    )
     }
 }

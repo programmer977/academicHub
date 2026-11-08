@@ -5,6 +5,7 @@ import { requireAuth } from "../auth/auth.guard.js";
 import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema } from "./activities.schema.js";
 import { activitiesService } from "./activities.service.js";
 import { activitiesRepository } from "./activities.repository.js";
+import { subject } from "../subjects/subjects.repository.js";
 
 export function activitiesRoutes(pool:Pool){
     return async function (app:FastifyInstance){
@@ -23,6 +24,7 @@ export function activitiesRoutes(pool:Pool){
                 }
             },async (request)=>{
                     return service.listActivities(subjectId);
+            }
         )
     }
 }

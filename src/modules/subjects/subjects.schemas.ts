@@ -13,3 +13,4 @@ export const subjectResponseSchema = z.object({
     name:z.string(),
     description:z.string().nullable(),
 })
+export const errorResponseSchema = z.object({message:z.string()})

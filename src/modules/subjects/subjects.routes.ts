@@ -67,7 +67,7 @@ export function subjectRoutes(pool:Pool){
         if(!deleted){
             return reply.code(404).send({message: "Subject not found"})
         }
-        return reply.code(200).send();
+        return reply.code(204).send();
     }
 )
     }

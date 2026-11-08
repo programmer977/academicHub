@@ -2,10 +2,9 @@ import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
-import { createSubjectSchema,subjectParamsSchema,subjectResponseSchema,updateSubjectSchema } from "./subjects.schemas.js";
+import { createSubjectSchema,errorResponseSchema,subjectParamsSchema,subjectResponseSchema,updateSubjectSchema } from "./subjects.schemas.js";
 import { subjectRepository } from "./subjects.repository.js";
 import { subjectService } from "./subjects.service.js";
-import { request } from "node:http";
 
 export function subjectRoutes(pool:Pool){
     return async function(app:FastifyInstance){
@@ -44,7 +43,7 @@ export function subjectRoutes(pool:Pool){
                 params:subjectParamsSchema,
                 response:{
                     200:subjectResponseSchema,
-                    404:subjectResponseSchema,
+                    404:errorResponseSchema,
                 }
             }
         },async (request,reply)=>{
@@ -52,7 +51,7 @@ export function subjectRoutes(pool:Pool){
             const {name,description}=request.body as {name?:string,description?:string};
             const updated = await service.updateSubject(request.user.sub,id,{name,description});
             if(!updated){
-                return reply.code(404);
+                return reply.code(404).send({message:"subject not found"});
             }
             return reply.code(200).send(updated);
         }

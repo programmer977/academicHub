@@ -23,7 +23,7 @@ export function activitiesRoutes(pool:Pool){
                     } 
                 }
             },async (request)=>{
-                    return service.listActivities(subjectId);
+                    return service.listActivities(request.user.sub);
             }
         )
     }

@@ -1,5 +1,4 @@
 import {Pool} from "pg";
-import { id } from "zod/locales";
 
 export type subject = {
     id:string,

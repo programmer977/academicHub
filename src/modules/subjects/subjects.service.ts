@@ -1,4 +1,3 @@
-import { DeserializeOptions } from "node:sqlite";
 import { subjectRepository } from "./subjects.repository.js";
 
 export class subjectService{

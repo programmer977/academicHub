@@ -33,13 +33,16 @@ export function activitiesRoutes(pool:Pool){
                 body:createActivitieSchema,
                 response:{
                     201:activitieResponseSchema,
-                    401:errorActivitiesResponseSchema,
+                    404:errorActivitiesResponseSchema,
                 }
             }
             }   ,async (request,reply)=>{
                 const{subjectId,name,description,status,dueAt}=request.body ;
                 const activitie = await service.insertActivitie(request.user.sub,subjectId,name,description??null,status,new Date(dueAt));
-                
+                if (!activitie) {
+                    return reply.code(404).send({message: "Subject not found"});
+                    };
+                return reply.code(201).send(activitie);
             }
         );
     }

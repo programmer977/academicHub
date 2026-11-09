@@ -6,6 +6,7 @@ import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSc
 import { activitiesService } from "./activities.service.js";
 import { activitiesRepository } from "./activities.repository.js";
 import { subject } from "../subjects/subjects.repository.js";
+import { userInfo } from "node:os";
 
 export function activitiesRoutes(pool:Pool){
     return async function (app:FastifyInstance){
@@ -25,6 +26,20 @@ export function activitiesRoutes(pool:Pool){
             },async (request)=>{
                     return service.listActivities(request.user.sub);
             }
-        )
+        );
+        routes.post("/activities",{
+            onRequest:[requireAuth],
+            schema:{
+                body:createActivitieSchema,
+                response:{
+                    201:activitieResponseSchema,
+                    401:errorActivitiesResponseSchema,
+                }
+            }
+            }   ,async (request,reply)=>{
+                const{name,description,status,dueAt}=request.body;
+                return service.insertActivitie(request.user.sub,name,description??null,status,dueAt);
+            }
+        );
     }
 }

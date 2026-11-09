@@ -11,6 +11,7 @@ export const activitieResponseSchema = z.object({
     id:z.uuid(),
     name:z.string(),
     description:z.string().nullable(),
+    status: z.enum(["pending","in_progress","completed"]),
     dueAt:z.date(),
 })
 export const errorActivitiesResponseSchema = z.object({message:z.string()})

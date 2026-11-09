@@ -37,8 +37,9 @@ export function activitiesRoutes(pool:Pool){
                 }
             }
             }   ,async (request,reply)=>{
-                const{name,description,status,dueAt}=request.body ;
-                const activitie = await service.insertActivitie(request.user.sub,name,description??null,status,new Date(dueAt));
+                const{subjectId,name,description,status,dueAt}=request.body ;
+                const activitie = await service.insertActivitie(request.user.sub,subjectId,name,description??null,status,new Date(dueAt));
+                
             }
         );
     }

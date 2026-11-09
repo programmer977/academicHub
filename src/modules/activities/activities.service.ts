@@ -7,4 +7,7 @@ export class activitiesService{
     async listActivities(userId:string){
         return this.repository.findAllActivitiesByUser(userId);
     }
+    async insertActivitie(userId:string,name:string,description:string|null,status:string,dueAt:Date){
+        return this.repository.createActivitie(userId,name,description,status,dueAt);
+    }
 }

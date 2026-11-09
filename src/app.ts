@@ -6,6 +6,7 @@ import { validatorCompiler, serializerCompiler, jsonSchemaTransform } from "fast
 import { Pool } from 'pg';
 import { authRoutes } from './modules/auth/auth.rotes.js';
 import { subjectRoutes } from './modules/subjects/subjects.routes.js';
+import { activitiesRoutes } from "./modules/activities/activities.route.js";
 
 type appOption = {pool:Pool,jwtSecret:string};
 
@@ -40,6 +41,10 @@ export function buildApp(option:appOption){
     app.register(subjectRoutes(option.pool),{
         prefix:"/api/v1"
     });
+    app.register(activitiesRoutes(option.pool), {
+    prefix: "/api/v1"
+    });
+
 
     app.setErrorHandler((error,request,reply)=>{
         const err = error as any;

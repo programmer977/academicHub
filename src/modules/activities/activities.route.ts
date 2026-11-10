@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
-import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema,activitiesParamsSchema, updateActivitiechema } from "./activities.schema.js";
+import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema,activitiesParamsSchema, updateActivitieSchema } from "./activities.schema.js";
 import { activitiesService } from "./activities.service.js";
 import { activitiesRepository } from "./activities.repository.js";
 import { subject } from "../subjects/subjects.repository.js";
@@ -55,8 +55,8 @@ export function activitiesRoutes(pool:Pool){
                     }
                 }
             } , async (request,reply)=>{
-                const {subjectId}= request.params as {subjectId:string};
-                const activity = await service.getActivitiesById(subjectId,request.user.sub);
+                const {id}= request.params as {id:string};
+                const activity = await service.getActivitiesById(id,request.user.sub);
                 if(!activity){
                     return reply.code(404).send({message: "Activity not found"});
                 } return reply.code(200).send(activity);
@@ -66,14 +66,18 @@ export function activitiesRoutes(pool:Pool){
             onRequest:[requireAuth],
             schema:{
                 params:activitiesParamsSchema,
-                body:updateActivitiechema,
+                body:updateActivitieSchema,
                 response:{
                     200:activitieResponseSchema,
                     400:errorActivitiesResponseSchema,
                 }
             }
         }, async (request,reply)=> {
-            const result = null;
+            const {id} = request.params;
+            const updated = await service.updateActivitie(id,request.user.sub,request.body);
+            if(!updated){
+                reply.code(400).send({message: "Activity not found or subject unavailable"})
+            } return reply.code(200).send(updated);
         }
     )
     }

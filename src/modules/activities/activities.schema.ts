@@ -7,9 +7,10 @@ export const createActivitieSchema = z.object({
     status: z.enum(["pending","in_progress","completed"]).default("pending"),
     dueAt:z.iso.datetime({offset:true}),
 })
-export const updateActivitiechema = createActivitieSchema.partial().refine(
+export const updateActivitieSchema = createActivitieSchema.partial().refine(
     (data)=>Object.keys(data).length>0,{message:"Provide at least one field"}
 );
+export type UpdateActivityInput = z.infer<typeof updateActivitieSchema>;
 export const activitieResponseSchema = z.object({
     id:z.uuid(),
     name:z.string(),
@@ -17,5 +18,5 @@ export const activitieResponseSchema = z.object({
     status: z.enum(["pending","in_progress","completed"]),
     dueAt:z.date(),
 })
-export const activitiesParamsSchema = z.object({subjectId:z.uuid()});
+export const activitiesParamsSchema = z.object({id:z.uuid()});
 export const errorActivitiesResponseSchema = z.object({message:z.string()})

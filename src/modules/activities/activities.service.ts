@@ -1,4 +1,5 @@
 import { activitiesRepository } from "./activities.repository.js";
+import { UpdateActivityInput } from "./activities.schema.js";
 
 
 export class activitiesService{
@@ -13,7 +14,7 @@ export class activitiesService{
     async getActivitiesById(subjectId:string,userId:string){
         return this.repository.findActivitiesById(subjectId,userId);
     }
-    async updateActivitie(subjectId:string,userId:string){
-        return this.repository.patchActivitie(subjectId,userId);
+    async updateActivitie(activitieId:string,userId:string,data:UpdateActivityInput){
+        return this.repository.patchActivitie(activitieId,userId,data);;
     }
 }

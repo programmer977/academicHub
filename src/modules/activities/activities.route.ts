@@ -59,7 +59,7 @@ export function activitiesRoutes(pool:Pool){
                 const activity = await service.listActivitiesById(request.user.sub,subjectId);
                 if(!activity){
                     return reply.code(404).send({message: "Activity not found"});
-                }
+                } return reply.code(200).send(activity);
             }
         );
         routes.patch("/activities/:id")

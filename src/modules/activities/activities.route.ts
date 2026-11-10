@@ -76,8 +76,9 @@ export function activitiesRoutes(pool:Pool){
             const {id} = request.params;
             const updated = await service.updateActivitie(id,request.user.sub,request.body);
             if(!updated){
-                reply.code(400).send({message: "Activity not found or subject unavailable"})
-            } return reply.code(200).send(updated);
+                return reply.code(400).send({message: "Activity not found or subject unavailable"})
+            }; 
+            return reply.code(200).send(updated);
         }
     )
     }

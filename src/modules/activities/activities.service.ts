@@ -10,7 +10,7 @@ export class activitiesService{
     async insertActivitie(userId:string,subjectId:string,name:string,description:string|null,status:string,dueAt:Date){
         return this.repository.createActivitie(userId,subjectId,name,description,status,dueAt);
     }
-    async listActivitiesById(userId:string,activitieId:string){
-        return this.repository.findAllactivitiesById(userId,activitieId);
+    async listActivitiesById(subjectId:string,activitieId:string){
+        return this.repository.findAllactivitiesById(subjectId,activitieId);
     }
 }

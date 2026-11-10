@@ -14,5 +14,5 @@ export const activitieResponseSchema = z.object({
     status: z.enum(["pending","in_progress","completed"]),
     dueAt:z.date(),
 })
-export const activitiesParamsSchema = z.object({id:z.uuid()});
+export const activitiesParamsSchema = z.object({subjectId:z.uuid()});
 export const errorActivitiesResponseSchema = z.object({message:z.string()})

@@ -55,8 +55,8 @@ export function activitiesRoutes(pool:Pool){
                     }
                 }
             } , async (request)=>{
-                const {id}= request.params as {id:string};
-                const result = await service.listActivitiesById(request.user.sub,id);
+                const {subjectId}= request.params as {subjectId:string};
+                const result = await service.listActivitiesById(request.user.sub,subjectId);
             }
         )
     }

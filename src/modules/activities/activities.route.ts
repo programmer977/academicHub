@@ -56,7 +56,7 @@ export function activitiesRoutes(pool:Pool){
                 }
             } , async (request,reply)=>{
                 const {subjectId}= request.params as {subjectId:string};
-                const activity = await service.getActivitiesById(request.user.sub,subjectId);
+                const activity = await service.getActivitiesById(subjectId,request.user.sub);
                 if(!activity){
                     return reply.code(404).send({message: "Activity not found"});
                 } return reply.code(200).send(activity);

@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
-import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema } from "./activities.schema.js";
+import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema,activitiesParamsSchema } from "./activities.schema.js";
 import { activitiesService } from "./activities.service.js";
 import { activitiesRepository } from "./activities.repository.js";
 import { subject } from "../subjects/subjects.repository.js";
@@ -45,5 +45,19 @@ export function activitiesRoutes(pool:Pool){
                 return reply.code(201).send(activitie);
             }
         );
+        routes.get("/activities/:id",{
+            onRequest:[requireAuth],
+            schema:{
+                params:activitiesParamsSchema,
+                response:{
+                    200:activitieResponseSchema,
+                    404:errorActivitiesResponseSchema,
+                    }
+                }
+            } , async (request)=>{
+                const {id}= request.params as {id:string};
+                const result = await service.listActivitiesById(request.user.sub,id);
+            }
+        )
     }
 }

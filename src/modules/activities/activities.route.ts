@@ -72,6 +72,9 @@ export function activitiesRoutes(pool:Pool){
                     400:errorActivitiesResponseSchema,
                 }
             }
-        })
+        }, async (request,reply)=> {
+            const result = null;
+        }
+    )
     }
 }

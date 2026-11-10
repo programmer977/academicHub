@@ -23,4 +23,8 @@ export class activitiesRepository{
         const result = await this.pool.query<activitie>(`SELECT a.id, a.title AS name, a.description, a.status, a.due_at AS "dueAt" FROM activities AS a INNER JOIN subjects AS s ON s.id = a.subject_id WHERE a.id = $1 AND s.user_id = $2;,`,[subjectId,userId]);
         return result.rows[0]??null;
     }
+    async patchActivitie(subjectId:string,userId:string){
+        const result = await this.pool.query<activitie>(`SELECT 1`);
+        return result.rows[0]??null;
+    }
 }

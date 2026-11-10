@@ -13,4 +13,7 @@ export class activitiesService{
     async getActivitiesById(subjectId:string,userId:string){
         return this.repository.findActivitiesById(subjectId,userId);
     }
+    async updateActivitie(subjectId:string,userId:string){
+        return this.repository.patchActivitie(subjectId,userId);
+    }
 }

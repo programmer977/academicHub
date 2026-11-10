@@ -54,10 +54,14 @@ export function activitiesRoutes(pool:Pool){
                     404:errorActivitiesResponseSchema,
                     }
                 }
-            } , async (request)=>{
+            } , async (request,reply)=>{
                 const {subjectId}= request.params as {subjectId:string};
-                const result = await service.listActivitiesById(request.user.sub,subjectId);
+                const activity = await service.listActivitiesById(request.user.sub,subjectId);
+                if(!activity){
+                    return reply.code(404).send({message: "Activity not found"});
+                }
             }
-        )
+        );
+        routes.patch("/activities/:id")
     }
 }

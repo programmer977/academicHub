@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
-import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema,activitiesParamsSchema } from "./activities.schema.js";
+import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema,activitiesParamsSchema, updateActivitiechema } from "./activities.schema.js";
 import { activitiesService } from "./activities.service.js";
 import { activitiesRepository } from "./activities.repository.js";
 import { subject } from "../subjects/subjects.repository.js";
@@ -62,6 +62,16 @@ export function activitiesRoutes(pool:Pool){
                 } return reply.code(200).send(activity);
             }
         );
-        routes.patch("/activities/:id")
+        routes.patch("/activities/:id",{
+            onRequest:[requireAuth],
+            schema:{
+                params:activitiesParamsSchema,
+                body:updateActivitiechema,
+                response:{
+                    200:activitieResponseSchema,
+                    400:errorActivitiesResponseSchema,
+                }
+            }
+        })
     }
 }

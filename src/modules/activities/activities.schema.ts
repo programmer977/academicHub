@@ -7,6 +7,9 @@ export const createActivitieSchema = z.object({
     status: z.enum(["pending","in_progress","completed"]).default("pending"),
     dueAt:z.iso.datetime({offset:true}),
 })
+export const updateActivitiechema = createActivitieSchema.partial().refine(
+    (data)=>Object.keys(data).length>0,{message:"Provide at least one field"}
+);
 export const activitieResponseSchema = z.object({
     id:z.uuid(),
     name:z.string(),

@@ -92,7 +92,7 @@ export function activitiesRoutes(pool:Pool){
                 const {id} = request.params as {id:string};
                 const deleted = await service.deleteActivityById(id,request.user.sub);
                 if(!deleted){return reply.code(404).send({message: "Subject not found"})};
-                return reply.code(204).send();
+                return reply.code(204).send(deleted);
             }
         );
     }

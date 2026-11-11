@@ -4,7 +4,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import { validatorCompiler, serializerCompiler, jsonSchemaTransform } from "fastify-type-provider-zod";
 import { Pool } from 'pg';
-import { authRoutes } from './modules/auth/auth.rotes.js';
+import { authRoutes } from './modules/auth/auth.routes.js';
 import { subjectRoutes } from './modules/subjects/subjects.routes.js';
 import { activitiesRoutes } from "./modules/activities/activities.route.js";
 

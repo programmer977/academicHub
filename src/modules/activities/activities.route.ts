@@ -3,16 +3,14 @@ import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
 import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema,activitiesParamsSchema, updateActivitieSchema } from "./activities.schema.js";
-import { activitiesService } from "./activities.service.js";
-import { activitiesRepository } from "./activities.repository.js";
-import { subject } from "../subjects/subjects.repository.js";
-import { userInfo } from "node:os";
+import { ActivitiesService } from "./activities.service.js";
+import { ActivitiesRepository } from "./activities.repository.js";
 
 export function activitiesRoutes(pool:Pool){
     return async function (app:FastifyInstance){
         const routes = app.withTypeProvider<ZodTypeProvider>();
-        const repository = new activitiesRepository(pool);
-        const service = new activitiesService(repository);
+        const repository = new ActivitiesRepository(pool);
+        const service = new ActivitiesService(repository);
 
 
         routes.get("/activities",{
@@ -38,11 +36,11 @@ export function activitiesRoutes(pool:Pool){
             }
             }   ,async (request,reply)=>{
                 const{subjectId,name,description,status,dueAt}=request.body ;
-                const activitie = await service.insertActivitie(request.user.sub,subjectId,name,description??null,status,new Date(dueAt));
-                if (!activitie) {
+                const Activity = await service.insertActivitie(request.user.sub,subjectId,name,description??null,status,new Date(dueAt));
+                if (!Activity) {
                     return reply.code(404).send({message: "Subject not found"});
                     };
-                return reply.code(201).send(activitie);
+                return reply.code(201).send(Activity);
             }
         );
         routes.get("/activities/:id",{
@@ -56,7 +54,7 @@ export function activitiesRoutes(pool:Pool){
                 }
             } , async (request,reply)=>{
                 const {id}= request.params as {id:string};
-                const activity = await service.getActivitiesById(id,request.user.sub);
+                const activity = await service.getActivityById(id,request.user.sub);
                 if(!activity){
                     return reply.code(404).send({message: "Activity not found"});
                 } return reply.code(200).send(activity);
@@ -74,7 +72,7 @@ export function activitiesRoutes(pool:Pool){
             }
         }, async (request,reply)=> {
             const {id} = request.params;
-            const updated = await service.updateActivitie(id,request.user.sub,request.body);
+            const updated = await service.updateActivity(id,request.user.sub,request.body);
             if(!updated){
                 return reply.code(404).send({message: "Activity not found or subject unavailable"})
             }; 

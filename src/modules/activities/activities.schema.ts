@@ -10,7 +10,7 @@ export const createActivitieSchema = z.object({
 export const updateActivitieSchema = createActivitieSchema.partial().refine(
     (data)=>Object.keys(data).length>0,{message:"Provide at least one field"}
 );
-export type UpdateActivityInput = z.infer<typeof updateActivitieSchema>;
+export type updateActivityInput = z.infer<typeof updateActivitieSchema>;
 export const activitieResponseSchema = z.object({
     id:z.uuid(),
     name:z.string(),

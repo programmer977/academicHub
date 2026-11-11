@@ -1,20 +1,20 @@
-import { activitiesRepository } from "./activities.repository.js";
-import { UpdateActivityInput } from "./activities.schema.js";
+import { ActivitiesRepository } from "./activities.repository.js";
+import { updateActivityInput } from "./activities.schema.js";
 
 
-export class activitiesService{
-    constructor(private readonly repository:activitiesRepository){};
+export class ActivitiesService{
+    constructor(private readonly repository:ActivitiesRepository){};
 
     async listActivities(userId:string){
         return this.repository.findAllActivitiesByUser(userId);
     }
     async insertActivitie(userId:string,subjectId:string,name:string,description:string|null,status:string,dueAt:Date){
-        return this.repository.createActivitie(userId,subjectId,name,description,status,dueAt);
+        return this.repository.createActivity(userId,subjectId,name,description,status,dueAt);
     }
-    async getActivitiesById(activityId:string,userId:string){
-        return this.repository.findActivitiesById(activityId,userId);
+    async getActivityById(activityId:string,userId:string){
+        return this.repository.findActivityById(activityId,userId);
     }
-    async updateActivitie(activitieId:string,userId:string,data:UpdateActivityInput){
-        return this.repository.patchActivitie(activitieId,userId,data);;
+    async updateActivity(activitieId:string,userId:string,data:updateActivityInput){
+        return this.repository.patchActivity(activitieId,userId,data);;
     }
 }

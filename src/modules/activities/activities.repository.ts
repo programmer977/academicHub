@@ -21,7 +21,7 @@ export class ActivitiesRepository{
         return result.rows[0]??null;
     }
     async findActivityById(acticvityId:string,userId:string):Promise<activitie|null>{
-        const result = await this.pool.query<activitie>(`SELECT a.id, a.title AS name, a.description, a.status, a.due_at AS "dueAt" FROM activities AS a INNER JOIN subjects AS s ON s.id = a.subject_id WHERE a.id = $1 AND s.user_id = $2;,`,[acticvityId,userId]);
+        const result = await this.pool.query<activitie>(`SELECT a.id, a.title AS name, a.description, a.status, a.due_at AS "dueAt" FROM activities AS a INNER JOIN subjects AS s ON s.id = a.subject_id WHERE a.id = $1 AND s.user_id = $2;`,[acticvityId,userId]);
         return result.rows[0]??null;
     }
     async patchActivity(activitieId:string,userId:string,data:updateActivityInput):Promise<activitie|null>{

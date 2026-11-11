@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
-import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema,activitiesParamsSchema, updateActivitieSchema } from "./activities.schema.js";
+import { createActivitieSchema,activitieResponseSchema,errorActivitiesResponseSchema,activitiesParamsSchema, updateActivitieSchema,responseWithNoContent } from "./activities.schema.js";
 import { ActivitiesService } from "./activities.service.js";
 import { ActivitiesRepository } from "./activities.repository.js";
 
@@ -84,15 +84,15 @@ export function activitiesRoutes(pool:Pool){
         schema:{
             params:activitiesParamsSchema,
             response:{
-                204:activitieResponseSchema,
                 404:errorActivitiesResponseSchema,
+                204:responseWithNoContent,
                     }
                 }
             },async(request,reply)=>{
                 const {id} = request.params as {id:string};
                 const deleted = await service.deleteActivityById(id,request.user.sub);
-                if(!deleted){return reply.code(404).send({message: "Subject not found"})};
-                return reply.code(204).send(deleted);
+                if(!deleted){return reply.code(404).send({message: "Subject not found"});}
+                return reply.code(204).send();
             }
         );
     }

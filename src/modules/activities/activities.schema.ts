@@ -20,3 +20,4 @@ export const activitieResponseSchema = z.object({
 })
 export const activitiesParamsSchema = z.object({id:z.uuid()});
 export const errorActivitiesResponseSchema = z.object({message:z.string()})
+export const responseWithNoContent = z.void();

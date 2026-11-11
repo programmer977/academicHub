@@ -84,13 +84,15 @@ export function activitiesRoutes(pool:Pool){
         schema:{
             params:activitiesParamsSchema,
             response:{
-                200:activitieResponseSchema,
-                400:errorActivitiesResponseSchema,
+                204:activitieResponseSchema,
+                404:errorActivitiesResponseSchema,
                     }
                 }
             },async(request,reply)=>{
                 const {id} = request.params as {id:string};
                 const deleted = await service.deleteActivityById(id,request.user.sub);
+                if(!deleted){return reply.code(404).send({message: "Subject not found"})};
+                return reply.code(204).send();
             }
         );
     }

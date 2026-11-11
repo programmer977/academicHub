@@ -78,6 +78,20 @@ export function activitiesRoutes(pool:Pool){
             }; 
             return reply.code(200).send(updated);
         }
-    )
+    );
+    routes.delete("/activities/:id",{
+        onRequest:[requireAuth],
+        schema:{
+            params:activitiesParamsSchema,
+            response:{
+                200:activitieResponseSchema,
+                400:errorActivitiesResponseSchema,
+                    }
+                }
+            },async(request,reply)=>{
+                const {id} = request.params as {id:string};
+                const deleted = await service.deleteActivityById(id,request.user.sub);
+            }
+        );
     }
 }

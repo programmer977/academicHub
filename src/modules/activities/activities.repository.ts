@@ -53,4 +53,8 @@ export class ActivitiesRepository{
             activitieId,userId]);
         return result.rows[0]??null;
     }
+    async deleteActivity(acticvityId:string,userId:string){
+        const result = await this.pool.query(`DELETE FROM subjects WHERE id = $1 AND user_id = $2 RETURNING id;`,[acticvityId,userId]);
+        return result.rows[0]??null;
+    }
 }

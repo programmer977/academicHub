@@ -17,4 +17,7 @@ export class ActivitiesService{
     async updateActivity(activitieId:string,userId:string,data:updateActivityInput){
         return this.repository.patchActivity(activitieId,userId,data);;
     }
+    async deleteActivityById(activityId:string,userId:string){
+        return this.repository.deleteActivity(activityId,userId);
+    }
 }

@@ -1,153 +1,57 @@
-## Academic Hub
+# Academic Hub
 
-    Status: Work in progress — backend API under active development. Not production-ready.
+**Academic Hub** is an academic management REST API designed to help university students organize their courses, assignments, deadlines, and, eventually, assessments and grades in one place.
 
-Academic Hub is a university-focused academic management application designed to centralize subjects, assignments, assessments, deadlines, and grades. Its goal is to help students organize academic responsibilities in one place.
+The backend is built with **Node.js, TypeScript, Fastify, and PostgreSQL**. It uses JWT-based authentication and a modular Route → Service → Repository architecture.
 
-The repository currently contains a Node.js + TypeScript REST API, authentication, subject endpoints, and an initial PostgreSQL schema. A student-facing frontend is not yet available.
-### Current Features
+> **Project status:** Work in progress. Authentication, subject management, and activity management are implemented in the codebase. The frontend, assessment endpoints, and automated test coverage are not yet available. **Not production-ready.**
 
-    User registration and login, with password hashing via Argon2id.
-    JWT-based authentication; access tokens expire after 15 minutes.
-    Authenticated user profile endpoint.
-    Subject routes for listing, creation, updates, and deletion (some update/delete behaviors remain incomplete).
-    Zod validation integrated with Fastify.
-    Parameterized PostgreSQL queries with pg.
-    Database migrations for users, subjects, activities, and assessments.
-    Interactive API documentation through Swagger UI at /docs.
-    Docker Compose configuration for PostgreSQL 17.
+## Features
 
-Not yet implemented: Activity and assessment HTTP routes, grade calculations, frontend, and operational automated tests.
-Tech Stack
-Component	Technology
-Runtime	Node.js 24
-Language	TypeScript
-Web framework	Fastify 5
-Database	PostgreSQL 17
-Database access	pg (node-postgres)
-Migrations	node-pg-migrate
-Authentication	@fastify/jwt
-Password hashing	Argon2id
-Validation	Zod + fastify-type-provider-zod
-API documentation	Swagger / OpenAPI
-Development database	Docker Compose
-Getting Started
-Prerequisites
+### Implemented
 
-    Node.js 24 and npm
-    Docker and Docker Compose
-    Git
+- **Authentication:** user registration, login, and authenticated profile retrieval.
+- **Password security:** password hashing and verification with Argon2id.
+- **JWT access tokens:** 15-minute expiration and protection of authenticated routes.
+- **Subjects:** create, list, update, and delete the signed-in user's subjects.
+- **Activities:** create, list, retrieve, update, and delete activities associated with the signed-in user's subjects.
+- **Activity tracking:** descriptions, due dates, and `pending`, `in_progress`, or `completed` statuses.
+- **Data isolation:** subject and activity queries are scoped to the authenticated user.
+- **Validation:** request validation with Zod and Fastify.
+- **Database:** PostgreSQL schema and versioned migrations with `node-pg-migrate`.
+- **API documentation:** Swagger UI at `/docs`.
 
-1. Clone and install dependencies
-git clone https://github.com/programmer977/academicHub.git
-cd academicHub
-npm install
-2. Configure environment variables
-cp .env.example .env
+**Implemented in source code does not mean fully tested:** automated unit and integration tests are not currently present in the repository.
 
-The development configuration includes:
-DATABASE_URL=postgresql://academichub:devPass@localhost:5433/academichub
-JWT_SECRET=replace_with_a_long_random_secret
-PORT=3000
+### Planned
 
-Generate a secret with a cryptographically secure tool, for example openssl rand -hex 32. Never commit the real .env file or use the example database credentials in production.
-3. Start PostgreSQL
-docker compose up -d db
-docker compose ps
+- Assessment and grade management endpoints.
+- Weighted grade calculations and academic summaries.
+- Student-facing frontend and dashboard.
+- Automated unit and integration tests.
+- Additional error handling, configuration hardening, and production safeguards.
 
-The database is available at 127.0.0.1:5433 on the host; the container uses port 5432. PostgreSQL data is stored in a Docker volume.
-4. Apply database migrations
+## Tech Stack
 
-Ensure DATABASE_URL is available to the migration CLI. Using the example development credentials:
-DATABASE_URL="postgresql://academichub:devPass@127.0.0.1:5433/academichub" npm run migrate -- up
-### 5. Start the API
-npm run dev
+| Layer | Technology |
+| --- | --- |
+| Runtime | Node.js 24 |
+| Language | TypeScript |
+| HTTP framework | Fastify 5 |
+| Database | PostgreSQL 17 |
+| Database client | `pg` (node-postgres) |
+| Database migrations | `node-pg-migrate` |
+| Authentication | `@fastify/jwt` |
+| Password hashing | Argon2id (`argon2`) |
+| Validation and schemas | Zod + `fastify-type-provider-zod` |
+| API documentation | Swagger / OpenAPI |
+| Local database | Docker Compose |
 
-    API base URL: http://localhost:3000/api/v1
-    Swagger UI: http://localhost:3000/docs
+## Project Structure
 
-npm run dev does not start the database container; start PostgreSQL first.
-API Endpoints
-
-The following routes are registered in the source code. Their presence does not imply that all behaviors have been integration-tested.
-Method	Endpoint	Requires JWT	Description
-POST	/api/v1/auth/register	No	Create an account
-POST	/api/v1/auth/login	No	Obtain a JWT access token
-GET	/api/v1/auth/me	Yes	Get current user information
-GET	/api/v1/subjects	Yes	List the authenticated user's subjects
-POST	/api/v1/subjects	Yes	Create a subject
-PATCH	/api/v1/subjects/:id	Yes	Update a subject (known missing-resource handling issue)
-DELETE	/api/v1/subjects/:id	Yes	Delete a subject (known response schema issue)
-Register
-curl -i -X POST http://localhost:3000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test Student",
-    "email": "student@example.com",
-    "password": "ExamplePassword123!"
-  }'
-
-A successful registration returns 201 Created. Passwords must have between 12 and 128 characters. Email uniqueness is enforced case-insensitively at the database level.
-Login
-curl -i -X POST http://localhost:3000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "student@example.com",
-    "password": "ExamplePassword123!"
-  }'
-
-A successful login returns accessToken, tokenType: "Bearer", and expiresIn: 900.
-Get current user
-curl -i http://localhost:3000/api/v1/auth/me \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-Create a subject
-curl -i -X POST http://localhost:3000/api/v1/subjects \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Computer Networks",
-    "description": "Networking fundamentals"
-  }'
-
-The subject name must contain 1–120 characters after trimming. The optional description can contain up to 1,200 characters or be null. Successful creation is configured to return 201 Created.
-List subjects
-curl -i http://localhost:3000/api/v1/subjects \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-
-Returns the current user's subjects ordered by name. An empty array is a valid result.
-Update a subject
-curl -i -X PATCH http://localhost:3000/api/v1/subjects/SUBJECT_UUID \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Advanced Computer Networks"}'
-Delete a subject
-curl -i -X DELETE http://localhost:3000/api/v1/subjects/SUBJECT_UUID \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-
-Warning: The current PATCH and DELETE implementations have known issues described below; they should not be considered production-ready.
-HTTP Status Codes
-Status	Description	Current use
-200 OK	Request succeeded	Login, profile, listing, update
-201 Created	Resource created	Registration, subject creation
-400 Bad Request	Invalid payload or URL parameters	Zod validation
-401 Unauthorized	Missing/invalid/expired token or invalid login	Auth guard and login
-404 Not Found	Route or resource unavailable	Unregistered endpoints; subject-level handling incomplete
-409 Conflict	Duplicate value violates a unique constraint	PostgreSQL code 23505
-500 Internal Server Error	Unexpected server error	Global Fastify error handler
-
-A dedicated 403 Forbidden authorization policy has not yet been added to the subject routes. Subject ownership is checked in SQL via user_id, so records owned by other users are not returned or modified by those queries.
-Database Model
-
-The initial migration defines four tables:
-Table	Purpose	API coverage
-users	Account information, roles, password hashes	Registration, login, profile
-subjects	Courses belonging to a user	Routes registered
-activities	Tasks, status, and deadlines per subject	Database schema only
-assessments	Grades, weights, and deadlines per subject	Database schema only
-
-The database includes a UNIQUE (user_id, name) constraint for subjects. Activities and assessments have foreign keys to subjects with ON DELETE CASCADE; removing a subject also removes related rows.
-### Architecture
+```text
 academicHub/
+├── .env.example
 ├── compose.yaml
 ├── migrations/
 │   └── 1793226435441_initial-schema.ts
@@ -161,51 +65,308 @@ academicHub/
 │   ├── modules/
 │   │   ├── auth/
 │   │   │   ├── auth.guard.ts
-│   │   │   ├── auth.rotes.ts
+│   │   │   ├── auth.routes.ts
 │   │   │   ├── auth.schemas.ts
 │   │   │   └── password.ts
-│   │   └── subjects/
-│   │       ├── subjects.repository.ts
-│   │       ├── subjects.routes.ts
-│   │       ├── subjects.schemas.ts
-│   │       └── subjects.service.ts
+│   │   ├── subjects/
+│   │   │   ├── subjects.repository.ts
+│   │   │   ├── subjects.routes.ts
+│   │   │   ├── subjects.schemas.ts
+│   │   │   └── subjects.service.ts
+│   │   └── activities/
+│   │       ├── activities.repository.ts
+│   │       ├── activities.route.ts
+│   │       ├── activities.schema.ts
+│   │       └── activities.service.ts
 │   └── types/
 │       └── jwt.d.ts
-├── .env.example
 ├── package.json
 └── tsconfig.json
+```
 
-The subject module follows a Route → Service → Repository → PostgreSQL structure.
-Available Scripts
-Command	Description
-npm run dev	Run the development server with watch mode
-npm run typecheck	Check types without creating compiled files
-npm run build	Compile TypeScript to dist/
-npm start	Start the compiled server
-npm run migrate -- up	Apply pending migrations
-npm run migrate -- down	Roll back a migration
+Business logic in the subjects and activities modules is separated into routes, services, and repositories. Repositories use parameterized SQL queries to access PostgreSQL.
 
-test:unit and test:integration are defined in package.json, but their referenced test files are not committed to the repository. Automated testing is not currently operational.
-Current Limitations
+## Getting Started
 
-    Update not-found handling: subjects.repository.ts throws a generic error for an absent subject, causing HTTP 500 instead of an intended 404.
-    Delete response mismatch: the DELETE query returns only id, while its route declares a success response schema requiring id, name, and description. The not-found response is also not explicit.
-    No complete frontend: only the backend is available.
-    Activities and assessments: tables exist, but API routes are not implemented.
-    Automated tests: test scripts reference files that are not in the repository.
-    Production readiness: error handling, test coverage, and security configuration require further work.
+### Requirements
 
-### Roadmap
+- Node.js 24 and npm
+- Docker with Docker Compose
+- Git
 
-    Fix subject update/delete behaviors and standardize HTTP errors.
-    Add integration tests for authentication and user-level data isolation.
-    Implement activity management and deadline tracking.
-    Implement assessment management and weighted grade calculations.
-    Build the frontend, dashboards, and academic overview.
+### 1. Clone the repository
 
-### Repository
+```bash
+git clone https://github.com/programmer977/academicHub.git
+cd academicHub
+npm install
+```
 
-Developed by
-programmer977 as an ongoing learning project.
+### 2. Configure environment variables
 
+```bash
+cp .env.example .env
+```
 
+Edit `.env` to provide the following variables:
+
+```dotenv
+DATABASE_URL=postgresql://academichub:<YOUR_DB_PASSWORD>@127.0.0.1:5433/academichub
+JWT_SECRET=<GENERATE_A_RANDOM_SECRET_AT_LEAST_32_CHARACTERS_LONG>
+PORT=3000
+```
+
+Replace the placeholders with real local values. You can generate a JWT secret with:
+
+```bash
+openssl rand -hex 32
+```
+
+**Important configuration mismatch:** at the time of writing, the password in `.env.example` does **not** match the `POSTGRES_PASSWORD` value committed in `compose.yaml`. Set the password portion of `DATABASE_URL` to match your local database configuration, or update the Compose configuration so both agree. If you have an existing Docker volume, changing `POSTGRES_PASSWORD` alone does not update the password of an already-initialized database.
+
+> Do not commit `.env` or reuse the sample Compose credentials in a real deployment. The current Compose configuration is intended for local development only.
+
+### 3. Start PostgreSQL
+
+```bash
+docker compose up -d db
+docker compose ps
+```
+
+The development database is exposed on `127.0.0.1:5433` on the host and listens on port `5432` inside the container.
+
+### 4. Apply migrations
+
+The migration CLI needs access to `DATABASE_URL`. In **Bash**, load the local environment file before running it:
+
+```bash
+set -a
+source .env
+set +a
+
+npm run migrate -- up
+```
+
+Run this after the database is available. To roll back a migration, use:
+
+```bash
+npm run migrate -- down
+```
+
+### 5. Start the API
+
+```bash
+npm run dev
+```
+
+- API base URL: `http://localhost:3000/api/v1`
+- Swagger UI: `http://localhost:3000/docs`
+
+The API checks the database connection during startup. `npm run dev` does **not** start the database container automatically.
+
+## API Endpoints
+
+The following endpoints are registered in the current source code. Except for registration and login, they require a valid bearer token.
+
+### Authentication
+
+| Method | Endpoint | Purpose | Authentication |
+| --- | --- | --- | --- |
+| `POST` | `/api/v1/auth/register` | Register a user | No |
+| `POST` | `/api/v1/auth/login` | Log in and receive a JWT | No |
+| `GET` | `/api/v1/auth/me` | Retrieve the authenticated user | Yes |
+
+### Subjects
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/v1/subjects` | List the user's subjects |
+| `POST` | `/api/v1/subjects` | Create a subject |
+| `PATCH` | `/api/v1/subjects/:id` | Update a subject |
+| `DELETE` | `/api/v1/subjects/:id` | Delete a subject |
+
+### Activities
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/v1/activities` | List activities across the user's subjects, ordered by due date |
+| `POST` | `/api/v1/activities` | Create an activity linked to an owned subject |
+| `GET` | `/api/v1/activities/:id` | Retrieve an activity |
+| `PATCH` | `/api/v1/activities/:id` | Update activity fields or move it to another owned subject |
+| `DELETE` | `/api/v1/activities/:id` | Delete an activity |
+
+All subject and activity endpoints require authentication. The `:id` route parameter is a UUID.
+
+Successful resource creation uses HTTP `201`; successful deletion uses HTTP `204`. Missing or inaccessible resources generally produce HTTP `404`. These are route-level behaviors defined in code, not results from a complete integration test suite.
+
+## Request Examples
+
+The examples below use `curl`.
+
+### Register a user
+
+```bash
+curl -i -X POST http://localhost:3000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test Student",
+    "email": "student@example.com",
+    "password": "ExamplePassword123!"
+  }'
+```
+
+Passwords must contain 12–128 characters.
+
+### Log in
+
+```bash
+curl -i -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "student@example.com",
+    "password": "ExamplePassword123!"
+  }'
+```
+
+A successful response includes an `accessToken`, `tokenType: "Bearer"`, and `expiresIn: 900` (seconds).
+
+For the remaining requests, set `TOKEN` to the token returned by login:
+
+```bash
+TOKEN="<YOUR_ACCESS_TOKEN>"
+```
+
+### Create a subject
+
+```bash
+curl -i -X POST http://localhost:3000/api/v1/subjects \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Computer Networks",
+    "description": "Networking fundamentals"
+  }'
+```
+
+Save the created subject's `id` to use in activity requests.
+
+### Create an activity
+
+```bash
+curl -i -X POST http://localhost:3000/api/v1/activities \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "subjectId": "<SUBJECT_UUID>",
+    "name": "Finish network topology assignment",
+    "description": "Submit the topology diagram and report",
+    "status": "pending",
+    "dueAt": "2027-03-15T18:00:00-03:00"
+  }'
+```
+
+For activity creation:
+
+- `subjectId` must identify a subject owned by the authenticated user.
+- `name` is required (1–150 characters).
+- `description` is optional, nullable, and limited to 2,000 characters.
+- `status` is optional and defaults to `pending`.
+- `dueAt` is required and must be an ISO 8601 date-time with a timezone offset.
+
+### List activities
+
+```bash
+curl -i http://localhost:3000/api/v1/activities \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Update an activity
+
+```bash
+curl -i -X PATCH http://localhost:3000/api/v1/activities/<ACTIVITY_UUID> \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "in_progress"
+  }'
+```
+
+### Delete an activity
+
+```bash
+curl -i -X DELETE http://localhost:3000/api/v1/activities/<ACTIVITY_UUID> \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+You can inspect the other endpoints and schemas through Swagger UI at `/docs`.
+
+## Database Model
+
+The initial migration defines four tables:
+
+| Table | Purpose | Current HTTP API |
+| --- | --- | --- |
+| `users` | User accounts, roles, and password hashes | Registration, login, profile |
+| `subjects` | Courses belonging to a user | CRUD routes |
+| `activities` | Tasks, statuses, and due dates linked to subjects | CRUD routes |
+| `assessments` | Grades, weights, and assessment deadlines | Not implemented yet |
+
+**Relationships**
+
+- One user can own multiple subjects.
+- One subject can contain multiple activities and assessments.
+- Deleting a user cascades to their subjects.
+- Deleting a subject cascades to its activities and assessments.
+- Subjects have a unique `(user_id, name)` constraint.
+- User email uniqueness is enforced case-insensitively.
+
+## Design and Security Notes
+
+- Passwords are stored as Argon2id hashes, not plaintext.
+- JWTs expire after 15 minutes; refresh tokens are not implemented.
+- SQL statements use parameterized queries.
+- Subject and activity access is scoped through the authenticated user's ID.
+- Incoming request bodies and UUID parameters are validated with Zod.
+- PostgreSQL migrations define and evolve the schema.
+
+This architecture provides a useful foundation for learning backend development, but it has **not** undergone a production security assessment.
+
+## Available Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the API in watch mode |
+| `npm run typecheck` | Type-check without generating JavaScript files |
+| `npm run build` | Compile TypeScript into `dist/` |
+| `npm start` | Run the compiled server |
+| `npm run migrate -- up` | Apply database migrations |
+| `npm run migrate -- down` | Roll back a migration |
+
+**Testing notice:** `test:unit` and `test:integration` exist in `package.json`, but the test files they reference are not committed. The default `npm test` script is also a placeholder. Do not treat these as functioning test suites.
+
+## Known Limitations
+
+- **No frontend:** the repository currently contains the backend API only.
+- **No assessment HTTP endpoints:** the `assessments` table exists, but assessment management and weighted grade calculations are still planned.
+- **No automated regression coverage:** the endpoints have not been verified by a committed integration test suite.
+- **Configuration mismatch:** `.env.example` and `compose.yaml` currently specify different PostgreSQL passwords.
+- **Development-only database credentials:** the Compose file contains a hard-coded password; use secure configuration and rotate credentials before any real deployment.
+- **API error consistency:** responses and failure paths still need standardized integration tests; for example, the activity deletion route currently returns `Subject not found` when the requested activity does not exist.
+- **Authentication lifecycle:** refresh tokens, password recovery, rate limiting, and other production protections are not implemented.
+
+## Roadmap
+
+- [x] Initialize Node.js + TypeScript + Fastify backend
+- [x] Set up PostgreSQL and migrations
+- [x] Implement user registration and login
+- [x] Add JWT-protected subject routes
+- [x] Add JWT-protected activity routes
+- [ ] Add automated tests for authentication, subjects, and activities
+- [ ] Standardize error responses and improve configuration security
+- [ ] Implement assessments and grade calculations
+- [ ] Build a student-facing frontend and dashboard
+- [ ] Prepare deployment and production hardening
+
+## Author
+
+Developed by [programmer977](https://github.com/programmer977) as an ongoing backend development and academic management project.

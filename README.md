@@ -323,7 +323,7 @@ The initial migration defines four tables:
 ## Design and Security Notes
 
 - Passwords are stored as Argon2id hashes, not plaintext.
-- JWTs expire after 15 minutes; refresh tokens are not implemented.
+- JWTs expire after **15 minutes**; refresh tokens are not implemented.
 - SQL statements use parameterized queries.
 - Subject and activity access is scoped through the authenticated user's ID.
 - Incoming request bodies and UUID parameters are validated with Zod.
@@ -349,7 +349,6 @@ This architecture provides a useful foundation for learning backend development,
 - **No frontend:** the repository currently contains the backend API only.
 - **No assessment HTTP endpoints:** the `assessments` table exists, but assessment management and weighted grade calculations are still planned.
 - **No automated regression coverage:** the endpoints have not been verified by a committed integration test suite.
-- **Configuration mismatch:** `.env.example` and `compose.yaml` currently specify different PostgreSQL passwords.
 - **Development-only database credentials:** the Compose file contains a hard-coded password; use secure configuration and rotate credentials before any real deployment.
 - **API error consistency:** responses and failure paths still need standardized integration tests; for example, the activity deletion route currently returns `Subject not found` when the requested activity does not exist.
 - **Authentication lifecycle:** refresh tokens, password recovery, rate limiting, and other production protections are not implemented.

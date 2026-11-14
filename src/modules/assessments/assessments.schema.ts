@@ -12,5 +12,6 @@ export const createAssessmentSchema = z.object({
     weight:z.number().int().min(1).max(10),
     dueAt:z.iso.datetime({offset:true}),
 })
+export const assessmentsParamsSchema = z.object({subjectId:z.uuid()});
 export const averageResponseSchema = z.number().min(1).max(10).nullable();
 export const errorAverageSchema = z.void();

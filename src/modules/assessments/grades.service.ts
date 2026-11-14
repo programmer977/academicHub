@@ -3,7 +3,7 @@ export type gradeInput = {
     weight:number,
 };
 
-export function calculateGradeAvarage(assessments:readonly gradeInput[]):number|null{
+export function calculateGradeAverage(assessments:readonly gradeInput[]):number|null{
     let weightedTotal:number = 0; let totalWeight:number = 0;
 
     for(const assessment of assessments){

@@ -5,18 +5,19 @@ const gradeSchema = z.number().min(0).max(10).refine(
         message:"Grade must have at most two decimal places"
     });
 export const assessmentResponseSchema = z.object({
+    id:z.uuid(),
     subjectId:z.uuid(),
     title:z.string().min(1).max(150),
     grade:gradeSchema.nullable(),
-    weght:z.number().int().min(1).max(10),
-    dueAt:z.iso.datetime({offset:true})
+    weight:z.number().int().min(1).max(10),
+    dueAt:z.date,
 });
 export const createAssessmentSchema = z.object({
     subjectId:z.uuid(),
     title:z.string().min(1).max(150),
     grade:gradeSchema.nullable().optional(),
     weight:z.number().int().min(1).max(10),
-    dueAt:z.iso.datetime({offset:true}),
+    dueAt:z.date(),
 })
 export const assessmentsParamsSchema = z.object({id:z.uuid()});
 export const averageResponseSchema = z.number().nullable();

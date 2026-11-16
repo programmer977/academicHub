@@ -6,6 +6,7 @@ interface assesment {
     title:string,
     grade:number,
     weight:number,
+    dueAt:Date,
 }
 
 export class assessmentsRepository{

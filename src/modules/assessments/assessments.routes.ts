@@ -37,13 +37,15 @@ export function assessmentsRoutes(pool:Pool){
             onRequest:[requireAuth],
             schema:{
                 response:{
-                    200:assessmentResponseSchema,
+                    200:assessmentResponseSchema.array(),
                     404:errorAssessmentSchema
                 }
             }
-            } , async (request)=>{
-                return service.getAssessments(request.user.sub);
-            }
-        )   
+            } , async(request,reply)=>{
+                const result = await service.getAllAssessments(request.user.sub);
+                if(!result){
+                    return reply.code(404).send();
+                } return reply.code(200).send(result);
+            });   
     };
 };

@@ -6,7 +6,7 @@ export class assessmentsService{
     async getSubjectAverageById(subjectId:string,userId:string){
         return this.repository.findAverageOfSubject(subjectId,userId);
     }
-    async getAssessments(userId:string){
-        return this.repository
+    async getAllAssessments(userId:string){
+        return this.repository.getAllAssessments(userId);
     }
 } 

@@ -10,7 +10,7 @@ export const assessmentResponseSchema = z.object({
     title:z.string().min(1).max(150),
     grade:gradeSchema.nullable(),
     weight:z.number().int().min(1).max(10),
-    dueAt:z.date,
+    dueAt:z.date(),
 });
 export const createAssessmentSchema = z.object({
     subjectId:z.uuid(),

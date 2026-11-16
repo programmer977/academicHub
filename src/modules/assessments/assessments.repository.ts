@@ -10,14 +10,23 @@ type AssessmentGradeRow = {
     weight: number | null;
 };
 
-interface assesment {
-    id:string,
-    subjectId:string,
-    title:string,
-    grade:number,
-    weight:number,
-    dueAt:Date,
-}
+type AssessmentRow = {
+    id: string;
+    subjectId: string;
+    title: string;
+    grade: number | null;
+    weight: number;
+    dueAt: Date;
+};
+
+export type AssessmentResponse = {
+    id: string;
+    subjectId: string;
+    title: string;
+    grade: number | null;
+    weight: number;
+    dueAt: string;
+};
 
 export class assessmentsRepository{
     constructor(private readonly pool:Pool){}

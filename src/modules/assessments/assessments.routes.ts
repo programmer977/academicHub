@@ -25,9 +25,7 @@ export function assessmentsRoutes(pool:Pool){
             }, async(request,reply)=>{
                 const {id} = request.params;
                 const result = await service.getSubjectAverageById(id,request.user.sub);
-                if (!result) {
-                    return reply.status(404).send();
-                        }
+                if (result === null) {return reply.code(404).send();}
                 const assesments = assessmentGradeItemSchema.array().parse(result);
                 const average = calculateGradeAverage(assesments);
                 return reply.code(200).send(average);         
@@ -41,10 +39,10 @@ export function assessmentsRoutes(pool:Pool){
                 }
             }
             } , async(request,reply)=>{
-                const result = await service.getAllAssessments(request.user.sub);
-                if(!result){
+                const assesments = await service.getAllAssessments(request.user.sub);
+                if(!assesments){
                     return reply.code(404).send();
-                } return reply.code(200).send(result);
+                } return reply.code(200).send(assesments);
             });   
     };
 };

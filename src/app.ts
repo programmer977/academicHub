@@ -7,6 +7,7 @@ import { Pool } from 'pg';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { subjectRoutes } from './modules/subjects/subjects.routes.js';
 import { activitiesRoutes } from "./modules/activities/activities.route.js";
+import { assessmentsRoutes } from "./modules/assessments/assessments.routes.js";
 
 type appOption = {pool:Pool,jwtSecret:string};
 
@@ -42,6 +43,9 @@ export function buildApp(option:appOption){
         prefix:"/api/v1"
     });
     app.register(activitiesRoutes(option.pool), {
+    prefix: "/api/v1"
+    });
+    app.register(assessmentsRoutes(option.pool), {
     prefix: "/api/v1"
     });
 

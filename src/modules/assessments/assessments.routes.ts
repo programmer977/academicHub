@@ -23,7 +23,7 @@ export function assessmentsRoutes(pool:Pool){
             }
             }, async(request)=>{
                 const {subjectId} = request.params;
-                return service.getSubjectAverageById(request.user.sub,subjectId);
+                return service.getSubjectAverageById(subjectId,request.user.sub);
         });
     };
 };

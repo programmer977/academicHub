@@ -16,7 +16,7 @@ export class assessmentsRepository{
         if(!result){return null};
         return result.rows;
     };
-    async getAllAssessments(subjectId:string,userId:string):Promise<assesment[]|null>{
+    async getAllAssessments(userId:string):Promise<assesment[]|null>{
         const result = await this.pool.query(`SELECT 1`);
         if(!result){
             return null;

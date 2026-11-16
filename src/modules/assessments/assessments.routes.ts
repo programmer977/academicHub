@@ -43,7 +43,7 @@ export function assessmentsRoutes(pool:Pool){
                 }
             }
             } , async(request)=>{
-                return service.getAssessments(subjectId,request.user.sub);
+                return service.getAssessments(request.user.sub);
             }
         )   
     };

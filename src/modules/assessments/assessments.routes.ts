@@ -5,7 +5,6 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
 import { assessmentsService } from "./assessments.service.js";
 import { assessmentsRepository } from "./assessments.repository.js";
-import type { gradeInput } from "./grades.service.js";
 import { calculateGradeAverage } from "./grades.service.js";
 
 export function assessmentsRoutes(pool:Pool){

@@ -9,7 +9,7 @@ export function calculateGradeAverage(assessments: gradeInput[]):number|null{
     for(const assessment of assessments){
         if(assessment.grade === null){continue;};
         const {grade,weight}=assessment;
-        if(!Number.isFinite(grade)||grade>10||grade<0||!Number.isFinite(weight)||weight>10||weight<10){
+        if(!Number.isFinite(grade)||grade>10||grade<0||!Number.isFinite(weight)||weight>10||weight<1){
             throw new Error("invalid assessment values");
         }
         const gradeInCents = Math.round(grade*100);

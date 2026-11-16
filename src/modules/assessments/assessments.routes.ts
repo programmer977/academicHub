@@ -24,14 +24,13 @@ export function assessmentsRoutes(pool:Pool){
                 }
             }
             }, async(request,reply)=>{
-                const {subjectId} = request.params;
-                const result = await service.getSubjectAverageById(subjectId,request.user.sub);
+                const {id} = request.params;
+                const result = await service.getSubjectAverageById(id,request.user.sub);
                 if (!result) {
                     return reply.status(404).send();
                         }
-                const {grade,weight} = assessmentGradeItemSchema.parse(result);
-                const resultValues:gradeInput[] = [{grade,weight}];  
-                const average = calculateGradeAverage(resultValues); 
+                const assesments = assessmentGradeItemSchema.array().parse(result);
+                const average = calculateGradeAverage(assesments);
                 return reply.code(200).send(average);         
         });
         routes.get("/assessments", {
@@ -42,7 +41,7 @@ export function assessmentsRoutes(pool:Pool){
                     404:errorAssessmentSchema
                 }
             }
-            } , async(request)=>{
+            } , async (request)=>{
                 return service.getAssessments(request.user.sub);
             }
         )   

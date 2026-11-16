@@ -1,4 +1,4 @@
-import { assessmentsParamsSchema, averageResponseSchema, createAssessmentSchema, errorAverageSchema,assessmentGradeItemSchema } from "./assessments.schema.js";
+import { assessmentsParamsSchema, averageResponseSchema, createAssessmentSchema, errorAverageSchema,assessmentGradeItemSchema, assessmentResponseSchema,errorAssessmentSchema} from "./assessments.schema.js";
 import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
@@ -34,5 +34,17 @@ export function assessmentsRoutes(pool:Pool){
                 const average = calculateGradeAverage(resultValues); 
                 return reply.code(200).send(average);         
         });
+        routes.get("/assessments", {
+            onRequest:[requireAuth],
+            schema:{
+                response:{
+                    200:assessmentResponseSchema,
+                    404:errorAssessmentSchema
+                }
+            }
+            } , async(request)=>{
+                return service.getAssessments(subjectId,request.user.sub);
+            }
+        )   
     };
 };

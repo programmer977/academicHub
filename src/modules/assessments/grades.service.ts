@@ -15,7 +15,7 @@ export function calculateGradeAverage(assessments: gradeInput[]):number|null{
         const gradeInCents = Math.round(grade*100);
         weightedTotal+=gradeInCents*weight;
         totalWeight+=weight;
-        if(totalWeight===0){return null};
     }
+        if(totalWeight===0){return null};
         return Math.round((weightedTotal/totalWeight))/100;
 }

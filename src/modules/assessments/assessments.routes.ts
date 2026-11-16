@@ -1,10 +1,12 @@
-import { assessmentsParamsSchema, averageResponseSchema, createAssessmentSchema, errorAverageSchema } from "./assessments.schema.js";
+import { assessmentsParamsSchema, averageResponseSchema, createAssessmentSchema, errorAverageSchema,assessmentGradeItemSchema } from "./assessments.schema.js";
 import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
 import { assessmentsService } from "./assessments.service.js";
 import { assessmentsRepository } from "./assessments.repository.js";
+import type { gradeInput } from "./grades.service.js";
+import { calculateGradeAverage } from "./grades.service.js";
 
 export function assessmentsRoutes(pool:Pool){
     return async function(app:FastifyInstance){
@@ -21,9 +23,16 @@ export function assessmentsRoutes(pool:Pool){
                     404:errorAverageSchema,
                 }
             }
-            }, async(request)=>{
+            }, async(request,reply)=>{
                 const {subjectId} = request.params;
-                return service.getSubjectAverageById(subjectId,request.user.sub);
+                const result = await service.getSubjectAverageById(subjectId,request.user.sub);
+                if (!result) {
+                    return reply.status(404).send();
+                        }
+                const {grade,weight} = assessmentGradeItemSchema.parse(result);
+                const resultValues:gradeInput[] = [{grade,weight}];  
+                const average = calculateGradeAverage(resultValues); 
+                return reply.code(200).send(average);         
         });
     };
 };

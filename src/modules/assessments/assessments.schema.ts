@@ -13,8 +13,9 @@ export const createAssessmentSchema = z.object({
     dueAt:z.iso.datetime({offset:true}),
 })
 export const assessmentsParamsSchema = z.object({subjectId:z.uuid()});
-export const averageResponseSchema = z.object({
-    grade:gradeSchema,
-    weight:z.number().int().min(1).max(10),
-});
+export const averageResponseSchema = z.number().nullable();
 export const errorAverageSchema = z.void();
+export const assessmentGradeItemSchema = z.object({
+    grade: gradeSchema,
+    weight: z.number().int().min(1).max(10),
+});

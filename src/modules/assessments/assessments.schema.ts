@@ -10,20 +10,20 @@ export const assessmentResponseSchema = z.object({
     title:z.string().min(1).max(150),
     grade:gradeSchema.nullable(),
     weight:z.number().int().min(1).max(10),
-    dueAt:z.date(),
+    dueAt:z.iso.datetime({offset:true}),
 });
 export const createAssessmentSchema = z.object({
     subjectId:z.uuid(),
     title:z.string().min(1).max(150),
     grade:gradeSchema.nullable().optional(),
     weight:z.number().int().min(1).max(10),
-    dueAt:z.date(),
+    dueAt:z.iso.datetime({ offset: true }),
 })
 export const assessmentsParamsSchema = z.object({id:z.uuid()});
 export const averageResponseSchema = z.number().nullable();
 export const errorAverageSchema = z.void();
 export const errorAssessmentSchema = z.void();
 export const assessmentGradeItemSchema = z.object({
-    grade: gradeSchema,
+    grade: gradeSchema.nullable(),
     weight: z.number().int().min(1).max(10),
 });

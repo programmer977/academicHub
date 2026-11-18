@@ -53,4 +53,10 @@ export class assessmentsRepository{
         }
         return assessments;
         }
+        async createAssessment(userId:string,subjectId:string,title:string,grade:number,weight:number,dueAt:string):Promise<AssessmentResponse|null>{
+            const result = await this.pool.query(`INSERT INTO assessments (subject_id,title,grade,weight,due_at) SELECT s.id,$3,$4,$5,$6 FROM subjects AS s WHERE s.id = $2 AND s.user_id = $1 RETURNING id,subject_id AS subjectId,title,grade,weight,due_at AS "dueAT"`,[userId,subjectId,title,grade,weight,dueAt]);
+            const assessment:AssessmentResponse=result.rows[0];
+            if(!assessment){return null};
+            return assessment;
+        }
     }

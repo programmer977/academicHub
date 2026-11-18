@@ -46,7 +46,7 @@ export class assessmentsRepository{
         return result.rows;
         }
     async createAssessment(userId:string,subjectId:string,title:string,grade:number|null,weight:number,dueAt:string):Promise<AssessmentResponse|null>{
-        const result = await this.pool.query<AssessmentResponse>(`INSERT INTO assessments (subject_id,title,grade,weight,due_at) SELECT s.id,$3,$4,$5,$6 FROM subjects AS s WHERE s.id = $2 AND s.user_id = $1 RETURNING id,subject_id AS "subjectId",title,grade:float8 AS grade,weight,due_at AS "dueAt"`,[userId,subjectId,title,grade,weight,dueAt]);
+        const result = await this.pool.query<AssessmentResponse>(`INSERT INTO assessments (subject_id,title,grade,weight,due_at) SELECT s.id,$3,$4,$5,$6 FROM subjects AS s WHERE s.id = $2 AND s.user_id = $1 RETURNING id,subject_id AS "subjectId",title,grade::float8 AS grade,weight,due_at AS "dueAt";`,[userId,subjectId,title,grade,weight,dueAt]);
         return result.rows[0]??null;
     }
     async findAssessmentById(userId:string,assesmentId:string):Promise<AssessmentResponse|null>{

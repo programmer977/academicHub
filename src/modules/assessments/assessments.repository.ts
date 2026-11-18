@@ -63,27 +63,13 @@ export class assessmentsRepository{
             FROM subjects AS s WHERE a.id = $11 AND s.id = a.subject_id AND s.user_id = $12
             AND (NOT $9::boolean OR EXISTS ( SELECT 1 FROM subjects AS target WHERE target.id = $10::uuid AND target.user_id = $12))
             RETURNING a.id,a.subject_id AS "subjectId",a.title,a.grade::float8 AS grade,a.weight,a.due_at AS "dueAt";`,
-            [title !== undefined,
-            title ?? null,
-
-            grade !== undefined,
-            grade ?? null,
-
-            weight !== undefined,
-            weight ?? null,
-
-            dueAt !== undefined,
-            dueAt ?? null,
-
-            subjectId !== undefined,
-            subjectId ?? null,
-
-            assessmentId,
-            userId]);
+            [title !== undefined,title ?? null,grade !== undefined,grade ?? null,
+            weight !== undefined,weight ?? null,dueAt !== undefined,dueAt ?? null,
+            subjectId !== undefined,subjectId ?? null,assessmentId,userId]);
         return result.rows[0]??null;
     }
     async deleteAssessment(userId:string,assesmentId:string){
-        const result = await this.pool.query(`SELECT 1`);
+        const result = await this.pool.query(`DELETE FROM assessments AS a USING subjects AS s WHERE a.id = $1 AND a.subject_id = s.id AND s.user_id = $2 RETURNING a.id;`,[assesmentId,userId]);
         return result.rows[0]??null;
     }
 }

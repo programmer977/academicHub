@@ -109,7 +109,7 @@ export function assessmentsRoutes(pool:Pool){
                 const {id} = request.params;
                 const result = await service.deleteAssessment(request.user.sub,id);
                 if(!result){return reply.code(404).send({message:"assessment not found"})};
-                return reply.code(204).send({message:"assessment deleted"});
+                return reply.code(204).send();
             }
         )
 

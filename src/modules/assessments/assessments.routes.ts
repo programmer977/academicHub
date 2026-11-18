@@ -91,7 +91,9 @@ export function assessmentsRoutes(pool:Pool){
             }
             }, async (request,reply)=>{
                 const {id} = request.params;
-                const result = await service.updateAssessment(request.user.sub,id,request.body);
+                const updated = await service.updateAssessment(request.user.sub,id,request.body);
+                if (!updated) {return reply.code(404).send({message: "Assessment not found or subject unavailable"});};
+                return reply.code(200).send(updated);
             }
         );
         routes.delete("/assessments/:id",{

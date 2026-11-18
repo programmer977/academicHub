@@ -77,6 +77,20 @@ export function assessmentsRoutes(pool:Pool){
                 if(!result){return reply.code(400).send({message:"assessment not found"})};
                 return reply.code(200).send(result);
             }
-        )
+        );
+        routes.patch("/assessments/:id",{
+            onRequest:[requireAuth],
+            schema:{
+                params:assessmentsParamsSchema,
+                response:{
+                    200:assessmentResponseSchema,
+                    404:errorAssessmentSchema,
+                }
+            }
+        }, async (request,reply)=>{
+            const {id} = request.params;
+            const result = await service.updateAssessment(request.user.sub,id);
+        }
+    );
     };
 };

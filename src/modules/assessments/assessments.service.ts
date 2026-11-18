@@ -15,4 +15,7 @@ export class assessmentsService{
     async getAssessmentbyId(userId:string,assessmentId:string){
         return this.repository.findAssessmentById(userId,assessmentId);
     }
+    async updateAssessment(userId:string,assesmentId:string){
+        return this.repository.patchAssessment(userId,assesmentId);
+    }
 } 

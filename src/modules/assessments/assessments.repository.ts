@@ -52,4 +52,8 @@ export class assessmentsRepository{
         const result = await this.pool.query<AssessmentResponse>(`SELECT a.id, a.subject_id AS "subjectId", a.title, a.grade::float8 AS grade, a.weight, a.due_at AS "dueAt" FROM assessments AS a INNER JOIN subjects AS s ON s.id = a.subject_id WHERE a.id = $1 AND s.user_id = $2;`,[assesmentId,userId]);
         return result.rows[0]??null;
     }
+    async patchAssessment(userId:string,assesmentId:string):Promise<AssessmentResponse|null>{
+        const result = await this.pool.query<AssessmentResponse>(`SELECT 1`);
+        return result.rows[0]??null;
+    }
 }

@@ -73,7 +73,7 @@ export function assessmentsRoutes(pool:Pool){
                 }
             } , async (request,reply)=>{
                 const {id} = request.params;
-                const result = await service.getAssessmentbyId;
+                const result = await service.getAssessmentbyId(request.user.sub,id);
                 if(!result){return reply.code(400).send({message:"assessment not found"})};
                 return reply.code(200).send(result);
             }

@@ -18,4 +18,7 @@ export class assessmentsService{
     async updateAssessment(userId:string,assesmentId:string){
         return this.repository.patchAssessment(userId,assesmentId);
     }
+    async deleteAssessment(userId:string,assesmentId:string){
+        return this.repository.deleteAssessment(userId,assesmentId);
+    }
 } 

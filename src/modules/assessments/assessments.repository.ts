@@ -56,4 +56,8 @@ export class assessmentsRepository{
         const result = await this.pool.query<AssessmentResponse>(`SELECT 1`);
         return result.rows[0]??null;
     }
+    async deleteAssessment(userId:string,assesmentId:string){
+        const result = await this.pool.query(`SELECT 1`);
+        return result.rows[0]??null;
+    }
 }

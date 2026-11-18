@@ -1,4 +1,4 @@
-import { assessmentsParamsSchema, averageResponseSchema, createAssessmentSchema, errorAverageSchema,assessmentGradeItemSchema, assessmentResponseSchema,errorAssessmentSchema} from "./assessments.schema.js";
+import { assessmentsParamsSchema, averageResponseSchema, createAssessmentSchema, errorAverageSchema,assessmentGradeItemSchema, assessmentResponseSchema,errorAssessmentSchema, assessmentVoidResponseSchema} from "./assessments.schema.js";
 import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
@@ -87,10 +87,27 @@ export function assessmentsRoutes(pool:Pool){
                     404:errorAssessmentSchema,
                 }
             }
-        }, async (request,reply)=>{
-            const {id} = request.params;
-            const result = await service.updateAssessment(request.user.sub,id);
-        }
-    );
+            }, async (request,reply)=>{
+                const {id} = request.params;
+                const result = await service.updateAssessment(request.user.sub,id);
+            }
+        );
+        routes.delete("/assessments/:id",{
+            onRequest:[requireAuth],
+            schema:{
+                params:assessmentsParamsSchema,
+                response:{
+                    204:assessmentVoidResponseSchema,
+                    404:errorAssessmentSchema,
+                    }
+                }
+            }, async (request,reply)=>{
+                const {id} = request.params;
+                const result = await service.deleteAssessment(request.user.sub,id);
+                if(!result){return reply.code(404).send({message:"assessment not found"})};
+                return reply.code(204).send({message:"assessment deleted"});
+            }
+        )
+
     };
 };

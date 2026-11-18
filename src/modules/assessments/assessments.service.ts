@@ -1,4 +1,5 @@
 import { assessmentsRepository } from "./assessments.repository.js";
+import { updateAssessmentType } from "./assessments.schema.js";
 
 export class assessmentsService{
     constructor(private readonly repository:assessmentsRepository){}
@@ -15,8 +16,8 @@ export class assessmentsService{
     async getAssessmentbyId(userId:string,assessmentId:string){
         return this.repository.findAssessmentById(userId,assessmentId);
     }
-    async updateAssessment(userId:string,assesmentId:string){
-        return this.repository.patchAssessment(userId,assesmentId);
+    async updateAssessment(userId:string,assessmentId:string,data:updateAssessmentType){
+        return this.repository.patchAssessment(userId,assessmentId,data);
     }
     async deleteAssessment(userId:string,assesmentId:string){
         return this.repository.deleteAssessment(userId,assesmentId);

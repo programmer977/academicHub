@@ -1,4 +1,4 @@
-import { assessmentsParamsSchema, averageResponseSchema, createAssessmentSchema, errorAverageSchema,assessmentGradeItemSchema, assessmentResponseSchema,errorAssessmentSchema, assessmentVoidResponseSchema} from "./assessments.schema.js";
+import { assessmentsParamsSchema, averageResponseSchema, createAssessmentSchema, errorAverageSchema,assessmentGradeItemSchema, assessmentResponseSchema,errorAssessmentSchema, assessmentVoidResponseSchema, updateAssessmentSchema} from "./assessments.schema.js";
 import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
@@ -6,6 +6,7 @@ import { requireAuth } from "../auth/auth.guard.js";
 import { assessmentsService } from "./assessments.service.js";
 import { assessmentsRepository } from "./assessments.repository.js";
 import { calculateGradeAverage } from "./grades.service.js";
+import { updateAssessmentType } from "./assessments.schema.js";
 
 export function assessmentsRoutes(pool:Pool){
     return async function(app:FastifyInstance){
@@ -82,6 +83,7 @@ export function assessmentsRoutes(pool:Pool){
             onRequest:[requireAuth],
             schema:{
                 params:assessmentsParamsSchema,
+                body:updateAssessmentSchema,
                 response:{
                     200:assessmentResponseSchema,
                     404:errorAssessmentSchema,
@@ -89,7 +91,7 @@ export function assessmentsRoutes(pool:Pool){
             }
             }, async (request,reply)=>{
                 const {id} = request.params;
-                const result = await service.updateAssessment(request.user.sub,id);
+                const result = await service.updateAssessment(request.user.sub,id,request.body);
             }
         );
         routes.delete("/assessments/:id",{

@@ -31,3 +31,4 @@ export const assessmentGradeItemSchema = z.object({
 export const updateAssessmentSchema = createAssessmentSchema.partial().refine(
         (data) => Object.keys(data).length > 0,{message: "Provide at least one field"}
     );
+export type updateAssessmentType = z.infer<typeof updateAssessmentSchema>;

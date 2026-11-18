@@ -12,4 +12,7 @@ export class assessmentsService{
     async postAssessment(userId:string,subjectId:string,title:string,grade:number|null,weight:number,dueAt:string){
         return this.repository.createAssessment(userId,subjectId,title,grade,weight,dueAt);
     }
+    async getAssessmentbyId(userId:string,assessmentId:string){
+        return this.repository.findAssessmentById(userId,assessmentId);
+    }
 } 

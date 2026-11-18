@@ -48,4 +48,8 @@ export class assessmentsRepository{
         const result = await this.pool.query<AssessmentResponse>(`INSERT INTO assessments (subject_id,title,grade,weight,due_at) SELECT s.id,$3,$4,$5,$6 FROM subjects AS s WHERE s.id = $2 AND s.user_id = $1 RETURNING id,subject_id AS subjectId,title,grade,weight,due_at AS "dueAT"`,[userId,subjectId,title,grade,weight,dueAt]);
         return result.rows[0]??null;
     }
+    async findAssessmentById(userId:string,assesmentId:string):Promise<AssessmentResponse|null>{
+        const result = await this.pool.query<AssessmentResponse>(`SELECT 1`);
+        return result.rows[0]??null;
+    }
 }

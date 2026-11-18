@@ -61,6 +61,22 @@ export function assessmentsRoutes(pool:Pool){
                         }
                 return reply.code(201).send(assessment);
             }
-        ) 
+        );
+        routes.get("/assessments/:id",{
+            onRequest:[requireAuth],
+            schema:{
+                params:assessmentsParamsSchema,
+                response:{
+                    200:assessmentResponseSchema,
+                    400:errorAssessmentSchema
+                    }
+                }
+            } , async (request,reply)=>{
+                const {id} = request.params;
+                const result = await service.getAssessmentbyId;
+                if(!result){return reply.code(400).send({message:"assessment not found"})};
+                return reply.code(200).send(result);
+            }
+        )
     };
 };

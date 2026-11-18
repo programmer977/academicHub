@@ -28,3 +28,6 @@ export const assessmentGradeItemSchema = z.object({
     grade: gradeSchema.nullable(),
     weight: z.number().int().min(1).max(10),
 });
+export const updateAssessmentSchema = createAssessmentSchema.partial().refine(
+        (data) => Object.keys(data).length > 0,{message: "Provide at least one field"}
+    );

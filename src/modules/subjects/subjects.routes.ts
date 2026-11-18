@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../auth/auth.guard.js";
-import { createSubjectSchema,errorResponseSchema,subjectParamsSchema,subjectResponseSchema,updateSubjectSchema } from "./subjects.schemas.js";
+import { createSubjectSchema,errorDeadlineSchema,deadlineResponseSchema,errorResponseSchema,subjectParamsSchema,subjectResponseSchema,updateSubjectSchema } from "./subjects.schemas.js";
 import { subjectRepository } from "./subjects.repository.js";
 import { subjectService } from "./subjects.service.js";
 
@@ -68,7 +68,21 @@ export function subjectRoutes(pool:Pool){
             return reply.code(404).send({message: "Subject not found"})
         }
         return reply.code(204).send();
-    }
-)
+            }
+        );
+        routes.get("/deadlines",{
+            onRequest:[requireAuth],
+            schema:{
+                response:{
+                    200:deadlineResponseSchema.array(),
+                    404:errorDeadlineSchema
+                    }
+                }
+            }, async(request,reply)=>{
+                    const result = await service.listDeadlines(request.user.sub);
+                    if(!result){return reply.code(404).send({message:"deadlines not found"})};
+                    return reply.code(200).send(result);
+                }
+        );
     }
 }

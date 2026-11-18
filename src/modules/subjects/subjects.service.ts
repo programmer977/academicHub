@@ -15,4 +15,7 @@ export class subjectService{
     async deleteSubject(userId:string,subjectId:string){
         return this.repository.delete(userId,subjectId);
     }
+    async listDeadlines(userId:string){
+        return this.repository.getDeadlines(userId);
+    }
 }

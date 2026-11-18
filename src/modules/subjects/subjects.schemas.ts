@@ -13,4 +13,10 @@ export const subjectResponseSchema = z.object({
     name:z.string(),
     description:z.string().nullable(),
 })
-export const errorResponseSchema = z.object({message:z.string()})
+export const errorResponseSchema = z.object({message:z.string()});
+export const deadlineResponseSchema = z.object({
+    title:z.string(),
+    type:z.string(),
+    dueAt:z.iso.datetime({offset:true}),
+});
+export const errorDeadlineSchema = z.object({message:z.string()});

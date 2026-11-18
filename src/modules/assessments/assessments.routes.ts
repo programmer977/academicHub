@@ -25,7 +25,7 @@ export function assessmentsRoutes(pool:Pool){
             }, async(request,reply)=>{
                 const {id} = request.params;
                 const result = await service.getSubjectAverageById(id,request.user.sub);
-                if (result === null) {return reply.code(404).send();}
+                if (result === null) {return reply.code(404).send({message:"average not found"});}
                 const assesments = assessmentGradeItemSchema.array().parse(result);
                 const average = calculateGradeAverage(assesments);
                 return reply.code(200).send(average);         
@@ -41,8 +41,26 @@ export function assessmentsRoutes(pool:Pool){
             } , async(request,reply)=>{
                 const assesments = await service.getAllAssessments(request.user.sub);
                 if(!assesments){
-                    return reply.code(404).send();
+                    return reply.code(404).send({message:"assessments not found"});
                 } return reply.code(200).send(assesments);
-            });   
+            }); 
+            routes.post("/assessments",{
+                onRequest:[requireAuth],
+                schema:{
+                    body:createAssessmentSchema,
+                    response:{
+                        201:assessmentResponseSchema,
+                        404:errorAssessmentSchema
+                    }
+                }
+            }, async (request,reply)=>{
+                const {subjectId,title,grade,weight,dueAt} = request.body;
+                const assessment = await service.postAssessment(request.user.sub,subjectId,title,grade??null,weight,dueAt);
+                if (!assessment) {
+                    return reply.code(404).send({message: "Subject not found"});
+                        }
+                return reply.code(201).send(assessment);
+            }
+        ) 
     };
 };

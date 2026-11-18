@@ -21,8 +21,8 @@ export const createAssessmentSchema = z.object({
 })
 export const assessmentsParamsSchema = z.object({id:z.uuid()});
 export const averageResponseSchema = z.number().nullable();
-export const errorAverageSchema = z.void();
-export const errorAssessmentSchema = z.void();
+export const errorAverageSchema = z.object({message:z.string()});
+export const errorAssessmentSchema = z.object({message:z.string()});
 export const assessmentGradeItemSchema = z.object({
     grade: gradeSchema.nullable(),
     weight: z.number().int().min(1).max(10),

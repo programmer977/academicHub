@@ -10,7 +10,7 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "migrate": "node-pg-migrate",
-    "test:unit": "node --import tsx --test tests/grades.test.ts",
+    "test:unit": "node --import tsx --test tests/grade.test.ts",
     "test:integration": "node --import tsx --test tests/auth.integration.test.ts"
   },
   "keywords": [],

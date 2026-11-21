@@ -70,6 +70,6 @@ export class assessmentsRepository{
     }
     async deleteAssessment(userId:string,assesmentId:string){
         const result = await this.pool.query(`DELETE FROM assessments AS a USING subjects AS s WHERE a.id = $1 AND a.subject_id = s.id AND s.user_id = $2 RETURNING a.id;`,[assesmentId,userId]);
-        return result.rows[0]>0;
+        return result.rows.length > 0;
     }
 }

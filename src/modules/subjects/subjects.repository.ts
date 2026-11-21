@@ -41,7 +41,7 @@ export class subjectRepository{
         return result.rows.length>0;
     }
     async getDeadlines(userId:string):Promise<deadline[]|null>{
-        const result = await this.pool.query<deadline>(`SELECT 'activity' AS type, a.title, a.due_at AS "dueAt" FROM activities AS a INNER JOIN subjects AS s ON s.id = a.subject_id WHERE s.user_id = $1 AND a.status <> 'completed' UNION ALL SELECT 'assessment' AS type, av.title, av.due_at AS "dueAt" FROM assessments AS av INNER JOIN subjects AS s ON s.id = av.subject_id WHERE s.user_id = $1 AND av.grade IS NULL ORDER BY dueAt ASC LIMIT 50;`,[userId]);
+        const result = await this.pool.query<deadline>(`SELECT 'activity' AS type, a.title, a.due_at AS "dueAt" FROM activities AS a INNER JOIN subjects AS s ON s.id = a.subject_id WHERE s.user_id = $1 AND a.status <> 'completed' UNION ALL SELECT 'assessment' AS type, av.title, av.due_at AS "dueAt" FROM assessments AS av INNER JOIN subjects AS s ON s.id = av.subject_id WHERE s.user_id = $1 AND av.grade IS NULL ORDER BY "dueAt" ASC LIMIT 50;`,[userId]);
         return result.rows??null;
     }
 };

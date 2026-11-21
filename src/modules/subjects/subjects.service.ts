@@ -6,6 +6,9 @@ export class subjectService{
     async listSubjects(userId:string){
         return this.repository.findAllByUser(userId);
     };
+    async getSubject(userId: string,subjectId: string) {
+    return this.repository.findById(userId,subjectId);
+}
     async createSubject(userId:string,name:string,description:string|null){
         return this.repository.create(userId,name,description);
     }

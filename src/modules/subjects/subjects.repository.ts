@@ -18,6 +18,10 @@ export class subjectRepository{
     const result = await this.pool.query(`SELECT id,name,description FROM subjects WHERE user_id=$1 ORDER BY name ASC`,[userId]);
     return result.rows;
 }
+    async findById(userId: string,subjectId: string): Promise<subject | null> {
+        const result = await this.pool.query<subject>(`SELECT id, name, description FROM subjects WHERE id = $1  AND user_id = $2`,[subjectId, userId]);
+        return result.rows[0] ?? null;
+}
     async create(userId:string,name:string,description:string|null):Promise<subject>{
     const result = await this.pool.query(`INSERT INTO subjects(user_id,name,description) VALUES ($1,$2,$3) RETURNING id,name,description`,[userId,name,description]);
     const subject = result.rows[0];

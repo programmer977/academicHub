@@ -21,7 +21,23 @@ export function subjectRoutes(pool:Pool){
             }
         } ,async (request)=>{
             return service.listSubjects(request.user.sub)
-    })
+    });
+    routes.get("/subjects/:id",{
+        onRequest: [requireAuth],
+        schema: {
+            params: subjectParamsSchema,
+            response: {
+                200: subjectResponseSchema,
+                404: errorResponseSchema
+            }
+        }
+    },async (request, reply) => {
+        const { id } = request.params;
+        const subject = await service.getSubject(request.user.sub,id);
+        if (!subject) {
+            return reply.code(404).send({message: "Subject not found"});
+        }return reply.code(200).send(subject);
+    });
     routes.post("/subjects",{
         onRequest:[requireAuth],
         schema:{

@@ -70,13 +70,10 @@ test("Auth integration tests", async (t) => {
     await t.test(
         "registers and authenticates a user",
         async () => {
-
             const email =
                 `test-${randomUUID()}@example.com`;
-
             const registerResponse =
                 await registerUser(email);
-
             assert.equal(
                 registerResponse.statusCode,
                 201
@@ -84,13 +81,11 @@ test("Auth integration tests", async (t) => {
             const loginResponse = await app.inject({
                 method: "POST",
                 url: "/api/v1/auth/login",
-
                 payload: {
                     email,
                     password: "TestPassword123456"
                 }
             });
-
             assert.equal(
                 loginResponse.statusCode,
                 200

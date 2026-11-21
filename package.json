@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "migrate": "node-pg-migrate",
     "test:unit": "node --import tsx --test tests/grade.test.ts",
-    "test:integration": "node --import tsx --test tests/auth.integration.test.ts"
+    "test:integration": "node --import tsx --test --test-concurrency=1 tests/*.integration.test.ts"
   },
   "keywords": [],
   "author": "",

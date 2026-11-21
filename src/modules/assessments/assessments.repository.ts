@@ -11,15 +11,6 @@ type AssessmentGradeRow = {
     weight: number | null;
 };
 
-type AssessmentRow = {
-    id: string;
-    subjectId: string;
-    title: string;
-    grade: number | null;
-    weight: number;
-    dueAt: Date;
-};
-
 export type AssessmentResponse = {
     id: string;
     subjectId: string;

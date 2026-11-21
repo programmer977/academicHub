@@ -4,6 +4,7 @@ node_modules
 .pnp.js
 .env
 .env.local
+.env.test
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

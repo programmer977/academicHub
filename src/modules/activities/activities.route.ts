@@ -16,6 +16,10 @@ export function activitiesRoutes(pool:Pool){
         routes.get("/activities",{
             onRequest:requireAuth,
             schema:{
+                tags:["Activities"],
+                summary:"Get all activities",
+                description:"Get all activities associated with a subject owned by the authenticated user.",
+                security: [{ bearerAuth: [] }],
                 response:{
                     200:activitieResponseSchema.array(),
                     404:errorActivitiesResponseSchema,
@@ -27,13 +31,18 @@ export function activitiesRoutes(pool:Pool){
         );
         routes.post("/activities",{
             onRequest:[requireAuth],
-            schema:{
-                body:createActivitieSchema,
-                response:{
-                    201:activitieResponseSchema,
-                    404:errorActivitiesResponseSchema,
-                }
-            }
+            schema: {
+                tags: ["Activities"],
+                summary: "Create an activity",
+                description:"Creates an activity associated with a subject owned by the authenticated user.",
+                security: [{ bearerAuth: [] }],
+                body: createActivitieSchema,
+                response: {
+                    201: activitieResponseSchema,
+                    400: errorActivitiesResponseSchema,
+                    401: errorActivitiesResponseSchema,
+                    404: errorActivitiesResponseSchema
+                }}
             }   ,async (request,reply)=>{
                 const{subjectId,name,description,status,dueAt}=request.body ;
                 const Activity = await service.insertActivitie(request.user.sub,subjectId,name,description??null,status,new Date(dueAt));
@@ -46,6 +55,10 @@ export function activitiesRoutes(pool:Pool){
         routes.get("/activities/:id",{
             onRequest:[requireAuth],
             schema:{
+                tags:["Activities"],
+                summary:"Get an activity by Id",
+                description:"Get an activity by Id associated with a subject owned by the authenticated user.",
+                security: [{ bearerAuth: [] }],
                 params:activitiesParamsSchema,
                 response:{
                     200:activitieResponseSchema,
@@ -63,6 +76,10 @@ export function activitiesRoutes(pool:Pool){
         routes.patch("/activities/:id",{
             onRequest:[requireAuth],
             schema:{
+                tags:["Activities"],
+                summary:"Update an activity by Id",
+                description:"Update an activity by Id associated with a subject owned by the authenticated user.",
+                security: [{ bearerAuth: [] }],
                 params:activitiesParamsSchema,
                 body:updateActivitieSchema,
                 response:{
@@ -82,6 +99,10 @@ export function activitiesRoutes(pool:Pool){
     routes.delete("/activities/:id",{
         onRequest:[requireAuth],
         schema:{
+            tags:["Activities"],
+            summary:"Delete an activity",
+            description:"Delete an activity associated with a subject owned by the authenticated user.",
+            security: [{ bearerAuth: [] }],
             params:activitiesParamsSchema,
             response:{
                 404:errorActivitiesResponseSchema,

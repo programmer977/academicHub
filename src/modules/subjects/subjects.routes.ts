@@ -15,6 +15,9 @@ export function subjectRoutes(pool:Pool){
     routes.get("/subjects",{
         onRequest:[requireAuth],
         schema:{
+            tags:["Subjects"],
+            summary:"Get all subjects.",
+            description:"Get all subjects for the authenticated user.",
             response:{
                 200:subjectResponseSchema.array(),
                 },

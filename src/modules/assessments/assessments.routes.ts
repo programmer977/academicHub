@@ -45,14 +45,11 @@ export function assessmentsRoutes(pool:Pool){
                 security:[{bearerAuth:[]}],
                 response:{
                     200:assessmentResponseSchema.array(),
-                    204:z.undefined(),
                 }
             }
             } , async(request,reply)=>{
                 const assesments = await service.getAllAssessments(request.user.sub);
-                if(!assesments){
-                    return reply.code(204).send();
-                } return reply.code(200).send(assesments);
+                return reply.code(200).send(assesments);
             }); 
             routes.post("/assessments",{
                 onRequest:[requireAuth],

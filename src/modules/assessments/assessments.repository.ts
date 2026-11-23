@@ -48,7 +48,7 @@ export class assessmentsRepository{
             assessments.push({grade: row.grade,weight: row.weight});
         } return assessments;
     };
-    async getAllAssessments(userId:string):Promise<AssessmentResponse[]|null>{
+    async getAllAssessments(userId:string):Promise<AssessmentResponse[]>{
         const result = await this.pool.query<AssessmentRow>(`SELECT a.id, a.subject_id as "subjectId" , a.title, a.grade::float8 AS grade, a.weight, a.due_at as "dueAt" FROM assessments AS a INNER JOIN subjects AS s ON s.id = a.subject_id WHERE s.user_id = $1 ORDER BY a.due_at ASC;;`,[userId]);
         return result.rows.map(toAssessmentResponse);
         }

@@ -17,7 +17,8 @@ export function subjectRoutes(pool:Pool){
         schema:{
             response:{
                 200:subjectResponseSchema.array(),
-                }
+                },
+            security:[{bearerAuth:[]}],
             }
         } ,async (request)=>{
             return service.listSubjects(request.user.sub)
@@ -25,6 +26,7 @@ export function subjectRoutes(pool:Pool){
     routes.get("/subjects/:id",{
         onRequest: [requireAuth],
         schema: {
+            security:[{bearerAuth:[]}],
             params: subjectParamsSchema,
             response: {
                 200: subjectResponseSchema,
@@ -41,6 +43,7 @@ export function subjectRoutes(pool:Pool){
     routes.post("/subjects",{
         onRequest:[requireAuth],
         schema:{
+            security:[{bearerAuth:[]}],
             body:createSubjectSchema,
             response:{
                 201:subjectResponseSchema
@@ -55,6 +58,7 @@ export function subjectRoutes(pool:Pool){
         routes.patch("/subjects/:id",{
             onRequest:[requireAuth],
             schema:{
+                security:[{bearerAuth:[]}],
                 body:updateSubjectSchema,
                 params:subjectParamsSchema,
                 response:{
@@ -75,6 +79,7 @@ export function subjectRoutes(pool:Pool){
     routes.delete("/subjects/:id",{
         onRequest:[requireAuth],
         schema:{
+            security:[{bearerAuth:[]}],
             params:subjectParamsSchema,
         }
     },async(request,reply)=>{
@@ -89,6 +94,7 @@ export function subjectRoutes(pool:Pool){
         routes.get("/deadlines",{
             onRequest:[requireAuth],
             schema:{
+                security:[{bearerAuth:[]}],
                 response:{
                     200:deadlineResponseSchema.array(),
                     404:errorDeadlineSchema

@@ -51,7 +51,7 @@ export function assessmentsRoutes(pool:Pool){
             } , async(request,reply)=>{
                 const assesments = await service.getAllAssessments(request.user.sub);
                 if(!assesments){
-                    return reply.code(204).send({message:"assessments not found"});
+                    return reply.code(204).send();
                 } return reply.code(200).send(assesments);
             }); 
             routes.post("/assessments",{

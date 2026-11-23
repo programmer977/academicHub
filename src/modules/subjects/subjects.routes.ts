@@ -26,6 +26,9 @@ export function subjectRoutes(pool:Pool){
     routes.get("/subjects/:id",{
         onRequest: [requireAuth],
         schema: {
+            tags: ["Subjects"],
+            summary: "Get all subjects",
+            description:"Get all academic subject for the authenticated user.",
             security:[{bearerAuth:[]}],
             params: subjectParamsSchema,
             response: {
@@ -43,10 +46,15 @@ export function subjectRoutes(pool:Pool){
     routes.post("/subjects",{
         onRequest:[requireAuth],
         schema:{
+            tags: ["Subjects"],
+            summary: "Create a subject",
+            description:"Creates a new academic subject for the authenticated user.",
             security:[{bearerAuth:[]}],
             body:createSubjectSchema,
             response:{
-                201:subjectResponseSchema
+                201:subjectResponseSchema,
+                400: errorResponseSchema,
+                401: errorResponseSchema
                 }
         }
         },async (request,reply)=>{
@@ -58,6 +66,9 @@ export function subjectRoutes(pool:Pool){
         routes.patch("/subjects/:id",{
             onRequest:[requireAuth],
             schema:{
+                tags: ["Subjects"],
+                summary: "Update a subject",
+                description:"Update a new academic subject for the authenticated user.",
                 security:[{bearerAuth:[]}],
                 body:updateSubjectSchema,
                 params:subjectParamsSchema,
@@ -79,6 +90,9 @@ export function subjectRoutes(pool:Pool){
     routes.delete("/subjects/:id",{
         onRequest:[requireAuth],
         schema:{
+            tags: ["Subjects"],
+            summary: "Delete a subject",
+            description:"Delete a new academic subject for the authenticated user.",
             security:[{bearerAuth:[]}],
             params:subjectParamsSchema,
         }
@@ -94,6 +108,9 @@ export function subjectRoutes(pool:Pool){
         routes.get("/deadlines",{
             onRequest:[requireAuth],
             schema:{
+                tags: ["Deadlines"],
+                summary: "Get all deadlines",
+                description:"Get all deadlines for the authenticated user.",
                 security:[{bearerAuth:[]}],
                 response:{
                     200:deadlineResponseSchema.array(),

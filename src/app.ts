@@ -24,14 +24,23 @@ export function buildApp(option:appOption){
         }
     });
     app.register(fastifySwagger, {
-        openapi:{
-            info:{
-                title:"academicHub API",
-                description: "Academic management REST API",
-                version: "1.0.0"
-            }
+    openapi: {
+        info: {
+        title: "AcademicHub API",
+        version: "1.0.0",
+        description: "Academic management REST API"
         },
-        transform : jsonSchemaTransform
+        components: {
+        securitySchemes: {
+            bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT"
+            }
+        }
+        }
+    },
+        transform: jsonSchemaTransform
     });
     app.register(fastifySwaggerUi, {
         routePrefix: "/docs"

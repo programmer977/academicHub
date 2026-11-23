@@ -28,7 +28,13 @@ type AssessmentRow = {
     dueAt: Date;
 };
 function toAssessmentResponse(row: AssessmentRow): AssessmentResponse {
-    return {id: row.id,subjectId: row.subjectId,title: row.title,grade: row.grade,weight: row.weight, dueAt: row.dueAt.toISOString()};
+    return {
+        id: row.id,
+        subjectId: row.subjectId,
+        title: row.title,
+        grade: row.grade,
+        weight: row.weight, 
+        dueAt: row.dueAt.toISOString()};
 }
 export class assessmentsRepository{
     constructor(private readonly pool:Pool){}

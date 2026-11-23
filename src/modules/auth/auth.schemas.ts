@@ -8,4 +8,20 @@ export const registerSchema = z.object({
 export const loginSchema = z.object({
     email:z.string().trim().toLowerCase().email(),
     password:z.string().min(1)
-})
+});
+export const publicUserSchema = z.object({
+    id: z.uuid(),
+    name: z.string(),
+    email: z.string().email(),
+    role: z.enum(["user", "admin"])
+});
+
+export const loginResponseSchema = z.object({
+    accessToken: z.string(),
+    tokenType: z.literal("Bearer"),
+    expiresIn: z.number().int().positive()
+});
+
+export const authErrorSchema = z.object({
+    message: z.string()
+});

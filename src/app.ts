@@ -24,26 +24,30 @@ export function buildApp(option:appOption){
         }
     });
     app.register(fastifySwagger, {
-    openapi: {
-        info: {
-        title: "AcademicHub API",
-        version: "1.0.0",
-        description: "Academic management REST API"
-        },
-        components: {
-        securitySchemes: {
-            bearerAuth: {
-            type: "http",
-            scheme: "bearer",
-            bearerFormat: "JWT"
-            }
-        }
-        }
-    },
+        openapi: {
+            info: {
+                title: "Academic Hub API",
+                version: "1.0.0",
+                description:"REST API for managing academic subjects, activities, assessments and deadlines."},
+            tags: [{name: "Authentication",description: "User registration and authentication"},
+                {name: "Subjects",description: "Academic subject management"},
+                {name: "Activities",description: "Academic activity management"},
+                {name: "Assessments",description: "Assessments and grade calculations"},
+                {name: "Deadlines",description: "Academic deadline tracking"}],
+            components: {
+                securitySchemes: {
+                    bearerAuth: {
+                        type: "http",
+                        scheme: "bearer",
+                        bearerFormat: "JWT"
+                        }
+                    }
+                }
+            },
         transform: jsonSchemaTransform
     });
-    app.register(fastifySwaggerUi, {
-        routePrefix: "/docs"
+app.register(fastifySwaggerUi, {
+    routePrefix: "/docs"
     });
     app.register(authRoutes(option.pool), {
     prefix: "/api/v1/auth"

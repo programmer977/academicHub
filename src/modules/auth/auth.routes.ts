@@ -3,7 +3,7 @@ import type { Pool } from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { hashPassword, verifyPassword } from "./password.js";
 import { requireAuth } from "./auth.guard.js";
-import { loginSchema, registerSchema } from "./auth.schemas.js";
+import { loginSchema, registerSchema ,loginResponseSchema , publicUserSchema,authErrorSchema } from "./auth.schemas.js";
 
 type databaseUser = {
     id: string;
@@ -16,7 +16,16 @@ type databaseUser = {
 export function authRoutes(pool: Pool) {
     return async function (app: FastifyInstance) {
         const routes = app.withTypeProvider<ZodTypeProvider>();
-        routes.post("/register", { schema: { body: registerSchema } }, 
+        routes.post("/register", {schema:{
+            tags:["Authentication"],
+            summary: "Register a new user",
+            description:"Creates a new account and returns the public user information.",
+            body: registerSchema,
+            response:{
+            201: publicUserSchema,
+            400: authErrorSchema,
+            409: authErrorSchema
+        }} }, 
         async (request, reply) => {const { name, email, password } = request.body;
             const passwordHash = await hashPassword(password);
             const result = await pool.query<databaseUser>(
@@ -25,9 +34,22 @@ export function authRoutes(pool: Pool) {
                  RETURNING id, name, email, role`,
                 [name, email, passwordHash]
             );
-            return reply.code(201).send(result.rows[0]);
+            const user = result.rows[0];
+            if (!user) {
+                return reply.code(409).send({ message: "User not registered" });
+                }
+            return reply.code(201).send(user);
         });
-        routes.post("/login", { schema: { body: loginSchema } }, 
+        routes.post("/login", { schema: { 
+            tags: ["Authentication"],
+            summary: "Authenticate user",
+            description:"Validates user credentials and returns a JWT access token.",
+            body: loginSchema ,
+            response:{
+                200: loginResponseSchema,
+                400: authErrorSchema,
+                401: authErrorSchema
+            }} }, 
         async (request, reply) => {const { email, password } = request.body;
             const result = await pool.query<databaseUser>(
                 `SELECT id, name, email, role, password_hash FROM users WHERE LOWER(email) = $1`,
@@ -40,7 +62,18 @@ export function authRoutes(pool: Pool) {
             const token = await reply.jwtSign({ sub: user.id, role: user.role });  
             return reply.send({ accessToken: token, tokenType: "Bearer", expiresIn: 900 });
         });
-        routes.get("/me", { onRequest: [requireAuth] }, 
+        routes.get("/me", { 
+            onRequest: [requireAuth],
+            schema:{
+                tags: ["Authentication"],
+                summary: "Get authenticated user",
+                description:"Returns the profile of the currently authenticated user.",
+                security: [{ bearerAuth: [] }],
+                response: {
+                    200: publicUserSchema,
+                    401: authErrorSchema
+                        }
+            }}, 
         async (request, reply) => {
             const result = await pool.query<databaseUser>(
                 `SELECT id, name, email, role FROM users WHERE id = $1`,

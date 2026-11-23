@@ -121,12 +121,10 @@ export function subjectRoutes(pool:Pool){
                 security:[{bearerAuth:[]}],
                 response:{
                     200:deadlineResponseSchema.array(),
-                    404:errorDeadlineSchema
                     }
                 }
             }, async(request,reply)=>{
                     const result = await service.listDeadlines(request.user.sub);
-                    if(!result){return reply.code(404).send({message:"deadlines not found"})};
                     return reply.code(200).send(result);
                 }
         );

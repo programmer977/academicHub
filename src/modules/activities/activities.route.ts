@@ -22,7 +22,6 @@ export function activitiesRoutes(pool:Pool){
                 security: [{ bearerAuth: [] }],
                 response:{
                     200:activitieResponseSchema.array(),
-                    404:errorActivitiesResponseSchema,
                     } 
                 }
             },async (request)=>{

@@ -16,13 +16,18 @@ export function assessmentsRoutes(pool:Pool){
 
         routes.get("/subjects/:id/average",{
             onRequest:[requireAuth],
-            schema:{
-                params:assessmentsParamsSchema,
-                response:{
-                    200:averageResponseSchema,
-                    404:errorAverageSchema,
-                }
-            }
+            schema: {
+            tags: ["Assessments"],
+            summary: "Calculate subject average",
+            description:"Calculates the weighted average of graded assessments for a subject. Returns null when no graded assessments are available.",
+            security: [{ bearerAuth: [] }],
+            params: assessmentsParamsSchema,
+            response: {
+                200: averageResponseSchema,
+                400: errorAverageSchema,
+                401: errorAverageSchema,
+                404: errorAverageSchema
+            }}
             }, async(request,reply)=>{
                 const {id} = request.params;
                 const result = await service.getSubjectAverageById(id,request.user.sub);
@@ -34,6 +39,10 @@ export function assessmentsRoutes(pool:Pool){
         routes.get("/assessments", {
             onRequest:[requireAuth],
             schema:{
+                tags:["Assessments"],
+                summary:"Get all assessments",
+                description:"Get all assessments associated with a subject owned by the authenticated user.",
+                security:[{bearerAuth:[]}],
                 response:{
                     200:assessmentResponseSchema.array(),
                     404:errorAssessmentSchema
@@ -48,6 +57,10 @@ export function assessmentsRoutes(pool:Pool){
             routes.post("/assessments",{
                 onRequest:[requireAuth],
                 schema:{
+                    tags:["Assessments"],
+                    summary:"Create an assessment",
+                    description:"Create an assessment associated with a subject owned by the authenticated user.",
+                    security:[{bearerAuth:[]}],
                     body:createAssessmentSchema,
                     response:{
                         201:assessmentResponseSchema,
@@ -66,6 +79,10 @@ export function assessmentsRoutes(pool:Pool){
         routes.get("/assessments/:id",{
             onRequest:[requireAuth],
             schema:{
+                tags:["Assessments"],
+                summary:"Get an assessment by Id",
+                description:"Get an assessment by Id associated with a subject owned by the authenticated user.",
+                security:[{bearerAuth:[]}],
                 params:assessmentsParamsSchema,
                 response:{
                     200:assessmentResponseSchema,
@@ -82,6 +99,10 @@ export function assessmentsRoutes(pool:Pool){
         routes.patch("/assessments/:id",{
             onRequest:[requireAuth],
             schema:{
+                tags:["Assessments"],
+                summary:"Patch an assessment",
+                description:"Patch an assessment associated with a subject owned by the authenticated user.",
+                security:[{bearerAuth:[]}],
                 params:assessmentsParamsSchema,
                 body:updateAssessmentSchema,
                 response:{
@@ -99,6 +120,10 @@ export function assessmentsRoutes(pool:Pool){
         routes.delete("/assessments/:id",{
             onRequest:[requireAuth],
             schema:{
+                tags:["Assessments"],
+                summary:"Delete an assessment",
+                description:"Delete an assessment associated with a subject owned by the authenticated user.",
+                security:[{bearerAuth:[]}],
                 params:assessmentsParamsSchema,
                 response:{
                     204:assessmentVoidResponseSchema,

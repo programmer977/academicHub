@@ -111,7 +111,7 @@ export function activitiesRoutes(pool:Pool){
             },async(request,reply)=>{
                 const {id} = request.params as {id:string};
                 const deleted = await service.deleteActivityById(id,request.user.sub);
-                if(!deleted){return reply.code(404).send({message: "Subject not found"});}
+                if(!deleted){return reply.code(404).send({message: "Activity not found"});}
                 return reply.code(204).send();
             }
         );

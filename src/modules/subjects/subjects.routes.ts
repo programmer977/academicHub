@@ -52,7 +52,7 @@ export function subjectRoutes(pool:Pool){
         schema:{
             tags: ["Subjects"],
             summary: "Create a subject",
-            description:"Creates a new academic subject for the authenticated user.",
+            description:"Create a new academic subject for the authenticated user.",
             security:[{bearerAuth:[]}],
             body:createSubjectSchema,
             response:{
@@ -72,7 +72,7 @@ export function subjectRoutes(pool:Pool){
             schema:{
                 tags: ["Subjects"],
                 summary: "Update a subject",
-                description:"Update a new academic subject for the authenticated user.",
+                description:"Update an academic subject for the authenticated user.",
                 security:[{bearerAuth:[]}],
                 body:updateSubjectSchema,
                 params:subjectParamsSchema,
@@ -96,7 +96,7 @@ export function subjectRoutes(pool:Pool){
         schema:{
             tags: ["Subjects"],
             summary: "Delete a subject",
-            description:"Delete a new academic subject for the authenticated user.",
+            description:"Delete an academic subject for the authenticated user.",
             security:[{bearerAuth:[]}],
             params:subjectParamsSchema,
             response: {

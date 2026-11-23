@@ -1,3 +1,4 @@
+import {z} from "zod/v4";
 import { assessmentsParamsSchema, averageResponseSchema, createAssessmentSchema, errorAverageSchema,assessmentGradeItemSchema, assessmentResponseSchema,errorAssessmentSchema, assessmentVoidResponseSchema, updateAssessmentSchema} from "./assessments.schema.js";
 import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
@@ -6,7 +7,6 @@ import { requireAuth } from "../auth/auth.guard.js";
 import { assessmentsService } from "./assessments.service.js";
 import { assessmentsRepository } from "./assessments.repository.js";
 import { calculateGradeAverage } from "./grades.service.js";
-import { updateAssessmentType } from "./assessments.schema.js";
 
 export function assessmentsRoutes(pool:Pool){
     return async function(app:FastifyInstance){
@@ -45,13 +45,13 @@ export function assessmentsRoutes(pool:Pool){
                 security:[{bearerAuth:[]}],
                 response:{
                     200:assessmentResponseSchema.array(),
-                    404:errorAssessmentSchema
+                    204:z.undefined(),
                 }
             }
             } , async(request,reply)=>{
                 const assesments = await service.getAllAssessments(request.user.sub);
                 if(!assesments){
-                    return reply.code(404).send({message:"assessments not found"});
+                    return reply.code(204).send({message:"assessments not found"});
                 } return reply.code(200).send(assesments);
             }); 
             routes.post("/assessments",{
@@ -64,6 +64,8 @@ export function assessmentsRoutes(pool:Pool){
                     body:createAssessmentSchema,
                     response:{
                         201:assessmentResponseSchema,
+                        400:errorAssessmentSchema,
+                        401:errorAssessmentSchema,
                         404:errorAssessmentSchema
                     }
                 }
@@ -86,13 +88,13 @@ export function assessmentsRoutes(pool:Pool){
                 params:assessmentsParamsSchema,
                 response:{
                     200:assessmentResponseSchema,
-                    400:errorAssessmentSchema
+                    404:errorAssessmentSchema
                     }
                 }
             } , async (request,reply)=>{
                 const {id} = request.params;
                 const result = await service.getAssessmentbyId(request.user.sub,id);
-                if(!result){return reply.code(400).send({message:"assessment not found"})};
+                if(!result){return reply.code(404).send({message:"assessment not found"})};
                 return reply.code(200).send(result);
             }
         );

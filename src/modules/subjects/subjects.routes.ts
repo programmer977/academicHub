@@ -1,3 +1,4 @@
+import {z} from "zod/v4";
 import type { FastifyInstance } from "fastify";
 import type {Pool} from "pg";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
@@ -30,8 +31,8 @@ export function subjectRoutes(pool:Pool){
         onRequest: [requireAuth],
         schema: {
             tags: ["Subjects"],
-            summary: "Get all subjects",
-            description:"Get all academic subject for the authenticated user.",
+            summary: "Get subject by ID",
+            description:"Returns a subject owned by the authenticated user.",
             security:[{bearerAuth:[]}],
             params: subjectParamsSchema,
             response: {
@@ -98,7 +99,10 @@ export function subjectRoutes(pool:Pool){
             description:"Delete a new academic subject for the authenticated user.",
             security:[{bearerAuth:[]}],
             params:subjectParamsSchema,
-        }
+            response: {
+                204: z.undefined(),                                                                              
+                404: errorResponseSchema
+            }}
     },async(request,reply)=>{
         const {id} = request.params as {id:string};
         const deleted = await service.deleteSubject(request.user.sub,id);

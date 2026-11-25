@@ -3,13 +3,15 @@ import { renderLogin } from "./pages/login.page.ts";
 import { renderRegister } from "./pages/register.page.ts";
 import { renderDashboard } from "./pages/dashboard.page.ts";
 import { renderSubjects } from "./pages/subject.pages.ts";
+import { renderActivities } from "./pages/activities.page.ts";
 
 type PageRenderer = (root: HTMLElement) => void | Promise<void>;
 const routes = new Map<string, PageRenderer>([
     ["/login", renderLogin],
     ["/register", renderRegister],
     ["/dashboard", renderDashboard],
-    ["/subjects", renderSubjects]
+    ["/subjects", renderSubjects],
+    ["/activities", renderActivities]
 ]);
 
 export async function router(): Promise<void> {

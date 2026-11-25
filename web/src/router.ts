@@ -5,6 +5,8 @@ import { renderDashboard } from "./pages/dashboard.page.ts";
 import { renderSubjects } from "./pages/subject.pages.ts";
 import { renderActivities } from "./pages/activities.page.ts";
 import {renderSubjectDetail} from "./pages/subject.detail.page.ts";
+import {renderAssessments} from "./pages/assessments.page.ts";
+import {renderDeadlines} from "./pages/deadlines.page.ts";
 
 type PageRenderer = (root: HTMLElement) => void | Promise<void>;
 const routes = new Map<string, PageRenderer>([
@@ -12,7 +14,9 @@ const routes = new Map<string, PageRenderer>([
     ["/register", renderRegister],
     ["/dashboard", renderDashboard],
     ["/subjects", renderSubjects],
-    ["/activities", renderActivities]
+    ["/activities", renderActivities],
+    ["/assessments", renderAssessments],
+    ["/deadlines", renderDeadlines]
 ]);
 
 export async function router(): Promise<void> {
@@ -47,12 +51,17 @@ export async function router(): Promise<void> {
     app.replaceChildren();
     if (authenticated) {
         const nav = document.createElement("nav");
-        nav.innerHTML = nav.innerHTML = `
-            <a href="#/dashboard">Dashboard</a>
-            <a href="#/subjects">Disciplinas</a>
-            <a href="#/activities">Atividades</a>
-            <button type="button" id="logout-button">Sair</button>
-        `;
+        nav.innerHTML = `
+                <a href="#/dashboard">Dashboard</a>
+                <a href="#/subjects">Disciplinas</a>
+                <a href="#/activities">Atividades</a>
+                <a href="#/assessments">Avaliações</a>
+                <a href="#/deadlines">Prazos</a>
+
+                <button type="button" id="logout-button">
+                    Sair
+                </button>
+            `;
         const logoutButton =nav.querySelector<HTMLButtonElement>("#logout-button");
         logoutButton?.addEventListener("click", () => {
             clearSession();

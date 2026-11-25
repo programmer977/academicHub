@@ -59,11 +59,7 @@ export async function renderActivities(root: HTMLElement): Promise<void> {
     let subjects: Subject[] = [];
     let editingActivityId: string | null = null;
     let busy = false;
-    const statusLabels: Record<ActivityStatus, string> = {
-        pending: "Pendente",
-        in_progress: "Em andamento",
-        completed: "Concluída"
-    };
+    const statusLabels: Record<ActivityStatus, string> = {pending: "Pendente",in_progress: "Em andamento",completed: "Concluída"};
     function setBusy(value: boolean): void {
         busy = value;
         saveButton.disabled =value || subjects.length === 0;
@@ -116,9 +112,7 @@ export async function renderActivities(root: HTMLElement): Promise<void> {
     }
     function getFilteredActivities(): Activity[] {
         const selectedStatus = statusFilter.value;
-        return activities.filter(activity => {
-            return (selectedStatus === "all" ||activity.status === selectedStatus);
-        });
+        return activities.filter(activity => {return (selectedStatus === "all" ||activity.status === selectedStatus);});
     }
     function renderActivityList(): void {
         const filteredActivities = getFilteredActivities();
@@ -202,9 +196,7 @@ export async function renderActivities(root: HTMLElement): Promise<void> {
             await refreshAfterMutation("Atividade excluída.");
         } catch (error) {
             feedback.textContent =error instanceof Error? error.message: "Erro ao excluir atividade.";
-        } finally {
-            setBusy(false);
-        }
+        } finally {setBusy(false);}
     }
     async function changeStatus(id: string,status: ActivityStatus): Promise<void> {
         if (busy) return;
@@ -217,11 +209,8 @@ export async function renderActivities(root: HTMLElement): Promise<void> {
             }
             await refreshAfterMutation("Status atualizado.");
         } catch (error) {
-            feedback.textContent =
-                error instanceof Error? error.message: "Erro ao alterar status.";
-        } finally {
-            setBusy(false);
-        }
+            feedback.textContent =error instanceof Error? error.message: "Erro ao alterar status.";
+        } finally {setBusy(false);}
     }
     form.addEventListener("submit", async event => {
         event.preventDefault();
@@ -242,9 +231,7 @@ export async function renderActivities(root: HTMLElement): Promise<void> {
             await refreshAfterMutation(successMessage);
         } catch (error) {
             feedback.textContent =error instanceof Error? error.message: "Não foi possível salvar a atividade.";
-        } finally {
-            setBusy(false);
-        }
+        } finally {setBusy(false);}
     });
     cancelButton.addEventListener("click", () => {
         if (busy) return;
@@ -272,7 +259,5 @@ export async function renderActivities(root: HTMLElement): Promise<void> {
         const errorItem = document.createElement("li");
         errorItem.textContent ="Não foi possível carregar as atividades.";
         list.replaceChildren(errorItem);
-    } finally {
-        setBusy(false);
-    }
+    } finally {setBusy(false);}
 }

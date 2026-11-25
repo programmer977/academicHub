@@ -1,5 +1,21 @@
 import "./style.css";
-import {apiFetch,setAccessToken} from "./api.ts";
+import {apiFetch,setAccessToken} from "./core/api.ts";
+import "./styles/global.css";
+import { router } from "./router.ts";
+import { login } from "../services/auth.service.ts";
+import {setAccessToken} from "../core/session.ts";
+import { listSubjects,deleteSubject } from "./services/subject.services.ts";
+
+function renderRoute(): void {
+    void router().catch(console.error);
+}
+
+window.addEventListener("hashchange", renderRoute);
+window.addEventListener("session-expired", () => {
+    window.location.hash = "/login";
+});
+
+renderRoute();
 
 type Subject = {
   id: string;
@@ -24,37 +40,40 @@ if (!loginForm ||!subjectForm ||!subjectsList ||!feedback) {
 function showMessage(message: string): void {
   feedback.textContent = message;
 }
-
 async function loadSubjects(): Promise<void> {
-  const response = await apiFetch("/subjects");
-  const subjects = response as Subject[];
-  subjectsList.replaceChildren();
-  for (const subject of subjects) {
-    const item = document.createElement("li");
-    item.textContent = subject.name;
-    subjectsList.appendChild(item);
-  }
-}
-loginForm.addEventListener("submit",async (event)=>{
-    event.preventDefault();
-    const formData = new FormData(loginForm);
-    const email = String(formData.get("email") ?? "");
-    const password = String(formData.get("password") ?? "");
-    try {
-      const response = await apiFetch(
-        "/auth/login",{
-          method: "POST",
-          body: JSON.stringify({email,password})
-        });
-      const login = response as LoginResponse;
-      setAccessToken(login.accessToken);
-      await loadSubjects();
-      showMessage("Login realizado.");
-    } catch {
-      showMessage("Não foi possível realizar o login.");
+    const subjects = await listSubjects();
+    subjectsList.replaceChildren();
+    if (subjects.length === 0) {
+        subjectsList.textContent ="Nenhuma disciplina cadastrada.";
+        return;
     }
-  }
-);
+
+    for (const subject of subjects) {
+        const item = document.createElement("li");
+        const title = document.createElement("h3");
+        title.textContent = subject.name;
+        const description = document.createElement("p");
+        description.textContent = subject.description ?? "Sem descrição.";
+        item.append(title, description);
+        subjectsList.appendChild(item);
+    }
+}
+loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = new FormData(loginForm);
+    const email = String(data.get("email") ?? "");
+    const password = String(data.get("password") ?? "");
+
+    try {
+        const response = await login({email,password
+        });
+        setAccessToken(response.accessToken);
+        loginForm.reset();
+        window.location.hash = "/dashboard";
+    } catch (error) {
+        feedback.textContent = error instanceof Error? error.message: "Falha na autenticação.";
+    }
+});
 subjectForm.addEventListener("submit",async (event) => {
     event.preventDefault();
     const formData = new FormData(subjectForm);
@@ -72,3 +91,20 @@ subjectForm.addEventListener("submit",async (event) => {
     }
   }
 );
+const deleteButton = document.createElement("button");
+deleteButton.type = "button";
+deleteButton.textContent = "Excluir";
+deleteButton.addEventListener("click", async () => {
+    const confirmed = window.confirm("Excluir esta disciplina e todas as suas atividades e avaliações?"
+    );
+    if (!confirmed) return;
+    try {
+        await deleteSubject(subject.id);
+
+        await loadSubjects();
+    } catch (error) {
+        feedback.textContent =
+            "Não foi possível excluir a disciplina.";
+    }
+});
+item.appendChild(deleteButton);

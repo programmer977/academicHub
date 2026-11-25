@@ -13,6 +13,7 @@ export const updateActivitieSchema = createActivitieSchema.partial().refine(
 export type updateActivityInput = z.infer<typeof updateActivitieSchema>;
 export const activitieResponseSchema = z.object({
     id:z.uuid(),
+    subjectId: z.uuid(),
     name:z.string(),
     description:z.string().nullable(),
     status: z.enum(["pending","in_progress","completed"]),

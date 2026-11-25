@@ -5,16 +5,10 @@ export function setAccessToken(token: string): void {accessToken = token;}
 export async function apiFetch(path: string,options: RequestInit = {}):Promise<unknown>{
   const headers = new Headers(options.headers);
   if (options.body !== undefined) {
-    headers.set(
-      "Content-Type",
-      "application/json"
-    );
+    headers.set("Content-Type","application/json");
   }
   if (accessToken !== null) {
-    headers.set(
-      "Authorization",
-      `Bearer ${accessToken}`
-    );
+    headers.set("Authorization",`Bearer ${accessToken}`);
   }
   const response = await fetch(`/api/v1${path}`,{...options,headers});
   if (!response.ok) {

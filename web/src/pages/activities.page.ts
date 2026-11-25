@@ -53,6 +53,9 @@ const list = requireElement<HTMLUListElement>(root, "#activities-list");
 const saveButton = requireElement<HTMLButtonElement>(root, "#save-button");
 const cancelButton = requireElement<HTMLButtonElement>(root, "#cancel-button");
 const statusFilter = requireElement<HTMLSelectElement>(root, "#status-filter");
+let activities: Activity[] = [];
+let editingActivityId: string | null = null;
+let busy = false;
 
 const subjects = await listSubjects();
 populateSubjectSelect(subjectSelect, subjects);

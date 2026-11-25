@@ -45,7 +45,7 @@ export class ActivitiesRepository{
         ELSE a.subject_id END
     FROM subjects AS s WHERE a.id = $11 AND s.id = a.subject_id AND s.user_id = $12
     AND (NOT $9::boolean OR EXISTS (SELECT 1 FROM subjects AS target WHERE target.id = $10::uuid AND target.user_id = $12))
-    RETURNING a.id,a.title AS name,a.description,a.status,a.due_at AS "dueAt";`,[
+    RETURNING a.id,a.subject_id AS "subjectId",a.title AS name,a.description,a.status,a.due_at AS "dueAt";`,[
             name !== undefined,name ?? null,
             description !== undefined,description ?? null,
             status !== undefined,status ?? null,

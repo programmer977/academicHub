@@ -4,6 +4,7 @@ import { renderRegister } from "./pages/register.page.ts";
 import { renderDashboard } from "./pages/dashboard.page.ts";
 import { renderSubjects } from "./pages/subject.pages.ts";
 import { renderActivities } from "./pages/activities.page.ts";
+import {renderSubjectDetail} from "./pages/subject.detail.page.ts";
 
 type PageRenderer = (root: HTMLElement) => void | Promise<void>;
 const routes = new Map<string, PageRenderer>([
@@ -31,8 +32,14 @@ export async function router(): Promise<void> {
         window.location.hash = "/dashboard";
         return;
     }
-
-    const render = routes.get(path);
+    let render = routes.get(path);
+    const subjectMatch = path.match(
+        /^\/subjects\/([^/]+)$/
+    );
+    const subjectId = subjectMatch?.[1];
+    if (!render && subjectId) {
+        render = root =>renderSubjectDetail(root, subjectId);
+    }
     if (!render) {
         window.location.hash = "/dashboard";
         return;

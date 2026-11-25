@@ -72,6 +72,9 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
         }
     }
     function renderSubject(subject: Subject): void {
+        const detailLink = document.createElement("a");
+        detailLink.href =`#/subjects/${subject.id}`;
+        detailLink.textContent ="Visualizar disciplina";
         const item = document.createElement("li");
         const title = document.createElement("h3");
         const description = document.createElement("p");
@@ -83,14 +86,12 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
         editButton.type = "button";
         deleteButton.textContent = "Excluir";
         deleteButton.type = "button";
-        editButton.addEventListener("click", () => {
-            startEditing(subject);
-
+        editButton.addEventListener("click", () => {startEditing(subject);
         });
         deleteButton.addEventListener("click", () => {
             void removeSubject(subject);
         });
-        item.append(title,description,editButton,deleteButton);
+        item.append(title,description,detailLink,editButton,deleteButton);
         subjectsList!.appendChild(item);
     }
     async function loadSubjects(): Promise<void> {

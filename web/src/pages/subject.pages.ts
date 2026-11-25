@@ -34,10 +34,13 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
     let busy = false;
 
     function setBusy(value: boolean): void {
-        busy = value;
-        saveButton!.disabled = value;
-        cancelButton!.disabled = value;
-    }
+    busy = value;
+    saveButton!.disabled = value;
+    cancelButton!.disabled = value;
+    nameInput!.disabled = value;
+    descriptionInput!.disabled = value;
+    subjectsList!.querySelectorAll<HTMLButtonElement>("button").forEach(button => {button.disabled = value;});
+}
     function resetForm(): void {
         editingSubjectId = null;
         form!.reset();
@@ -149,5 +152,6 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
     });
     cancelButton.addEventListener("click", resetForm);
     resetForm();
-    await loadSubjects();
+    setBusy(true);
+    try {await loadSubjects();} finally {setBusy(false);}
 }

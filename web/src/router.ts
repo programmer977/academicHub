@@ -1,38 +1,63 @@
-import { isAuthenticated } from "./core/session.ts";
-
+import {isAuthenticated,clearSession} from "./core/session.ts";
 import { renderLogin } from "./pages/login.page.ts";
-import { renderRegister } from "./pages/register.pages.ts";
+import { renderRegister } from "./pages/register.page.ts";
 import { renderDashboard } from "./pages/dashboard.page.ts";
-import { renderSubjects } from "./pages/subjects.page.ts";
-import { renderActivities } from "./pages/activities.page.ts";
-import { renderAssessments } from "./pages/assessments.page.ts";
-import { renderDeadlines } from "./pages/deadlines.page.ts";
-import { renderProfile } from "./pages/profile.page.ts";
+import { renderSubjects } from "./pages/subject.pages.ts";
 
-type PageRenderer = () => void | Promise<void>;
-
-const routes: Record<string, PageRenderer> = {
-    "/login": renderLogin,
-    "/register": renderRegister,
-    "/dashboard": renderDashboard,
-    "/subjects": renderSubjects,
-    "/activities": renderActivities,
-    "/assessments": renderAssessments,
-    "/deadlines": renderDeadlines,
-    "/profile": renderProfile
-};
+type PageRenderer = (root: HTMLElement) => void | Promise<void>;
+const routes = new Map<string, PageRenderer>([
+    ["/login", renderLogin],
+    ["/register", renderRegister],
+    ["/dashboard", renderDashboard],
+    ["/subjects", renderSubjects]
+]);
 
 export async function router(): Promise<void> {
-    const path = window.location.hash.slice(1) || "/dashboard";
-    const publicRoute = path === "/login" || path === "/register";
-    if (!publicRoute && !isAuthenticated()) {
+    const app = document.querySelector<HTMLElement>("#app");
+    if (!app) {
+        throw new Error("Elemento principal não encontrado");
+    }
+    const path =window.location.hash.slice(1) || "/dashboard";
+    const publicRoute =path === "/login" || path === "/register";
+    const authenticated = isAuthenticated();
+    if (!publicRoute && !authenticated) {
+        app.replaceChildren();
         window.location.hash = "/login";
         return;
     }
-    const render = routes[path];
+    if (publicRoute && authenticated) {
+        window.location.hash = "/dashboard";
+        return;
+    }
+
+    const render = routes.get(path);
     if (!render) {
         window.location.hash = "/dashboard";
         return;
     }
-    await render();
+    app.replaceChildren();
+    if (authenticated) {
+        const nav = document.createElement("nav");
+        nav.innerHTML = `
+            <a href="#/dashboard">Dashboard</a>
+            <a href="#/subjects">Disciplinas</a>
+            <button type="button" id="logout-button">Sair</button>
+        `;
+        const logoutButton =nav.querySelector<HTMLButtonElement>("#logout-button");
+        logoutButton?.addEventListener("click", () => {
+            clearSession();
+            app.replaceChildren();
+            window.location.hash = "/login";
+        });
+        app.appendChild(nav);
+    }
+    const page = document.createElement("div");
+    app.appendChild(page);
+    try {
+        await render(page);
+    } catch (error) {
+        if (page.isConnected) {
+            page.textContent =error instanceof Error? error.message: "Não foi possível carregar a página.";
+        }
+    }
 }

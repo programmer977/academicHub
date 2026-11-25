@@ -5,14 +5,20 @@ export type subject = {
     name:string,
     description:string|null,
 }
-export type deadline = {
-    title:string,
-    type:string,
-    dueAt:string
-}
-type DeadlineRow = {
+export type Deadline = {
+    id: string;
+    subjectId: string;
+    subjectName: string;
     title: string;
-    type: string;
+    type: "activity" | "assessment";
+    dueAt: string;
+};
+type DeadlineRow = {
+    id: string;
+    subjectId: string;
+    subjectName: string;
+    title: string;
+    type: "activity" | "assessment";
     dueAt: Date;
 };
 export class subjectRepository{
@@ -44,8 +50,8 @@ export class subjectRepository{
         const result = await this.pool.query(`DELETE FROM subjects WHERE id = $1 AND user_id = $2 RETURNING id`,[subjectId,userId]);
         return result.rows.length>0;
     }
-    async getDeadlines(userId: string): Promise<deadline[]> {
-        const result = await this.pool.query<DeadlineRow>(`SELECT 'activity' AS type, a.title, a.due_at AS "dueAt" FROM activities AS a INNER JOIN subjects AS s ON s.id = a.subject_id WHERE s.user_id = $1 AND a.status <> 'completed' UNION ALL SELECT 'assessment' AS type, av.title, av.due_at AS "dueAt" FROM assessments AS av INNER JOIN subjects AS s ON s.id = av.subject_id WHERE s.user_id = $1  AND av.grade IS NULL ORDER BY "dueAt" ASC LIMIT 50`,[userId]);
-        return result.rows.map((row) => ({title: row.title,type: row.type,dueAt: row.dueAt.toISOString()}));
+    async getDeadlines(userId: string): Promise<Deadline[]> {
+        const result = await this.pool.query<DeadlineRow>(`SELECT a.id, s.id AS "subjectId", s.name AS "subjectName", 'activity' AS type, a.title,  a.due_at AS "dueAt" FROM activities AS a INNER JOIN subjects AS s ON s.id = a.subject_id WHERE s.user_id = $1 AND a.status <> 'completed' UNION ALL SELECT av.id, s.id AS "subjectId", s.name AS "subjectName", 'assessment' AS type, av.title, av.due_at AS "dueAt" FROM assessments AS av INNER JOIN subjects AS s ON s.id = av.subject_id WHERE s.user_id = $1 AND av.grade IS NULL ORDER BY "dueAt" ASC LIMIT 50;`,[userId]);
+        return result.rows.map((row) => ({id: row.id , subjectId: row.subjectId, subjectName: row.subjectName,title: row.title,type: row.type,dueAt: row.dueAt.toISOString()}));
 }
 };

@@ -1,7 +1,7 @@
 import { isAuthenticated } from "./core/session.ts";
 
 import { renderLogin } from "./pages/login.page.ts";
-import { renderRegister } from "./pages/register.page.ts";
+import { renderRegister } from "./pages/register.pages.ts";
 import { renderDashboard } from "./pages/dashboard.page.ts";
 import { renderSubjects } from "./pages/subjects.page.ts";
 import { renderActivities } from "./pages/activities.page.ts";

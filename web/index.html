@@ -2,15 +2,9 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AcademicHub</title>
 </head>
-
 <body>
   <main>
     <header>
@@ -21,74 +15,17 @@
       </p>
     </header>
 
-    <section aria-labelledby="login-title">
-      <h2 id="login-title">Entrar</h2>
-
-      <form id="login-form">
-        <label for="email">
-          Email
-        </label>
-
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autocomplete="username"
-          required
-        >
-
-        <label for="password">
-          Senha
-        </label>
-
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autocomplete="current-password"
-          required
-        >
-
-        <button type="submit">
-          Entrar
-        </button>
+      <form id="register-form">
+        <label for="name">Nome</label>
+        <input id="name" name="name" minlength="2" maxlength="100" autocomplete="name" required>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" maxlength="254" autocomplete="email" required>
+        <label for="password">Senha</label>
+        <input id="password" name="password" type="password" minlength="12" maxlength="128" autocomplete="new-password" required>
+        <label for="confirmation">Confirmar senha</label>
+        <input id="confirmation" name="confirmation" type="password" autocomplete="new-password" required>
+        <button type="submit">Criar conta</button>
       </form>
-    </section>
-
-    <section aria-labelledby="subjects-title">
-      <h2 id="subjects-title">
-        Minhas disciplinas
-      </h2>
-
-      <form id="subject-form">
-        <label for="subject-name">
-          Nome da disciplina
-        </label>
-
-        <input
-          id="subject-name"
-          name="name"
-          required
-        >
-
-        <button type="submit">
-          Adicionar disciplina
-        </button>
-      </form>
-
-      <ul id="subjects-list"></ul>
-    </section>
-
-    <p
-      id="feedback"
-      role="status"
-      aria-live="polite"
-    ></p>
-  </main>
-
-  <script
-    type="module"
-    src="/src/main.ts"
-  ></script>
-</body>
+    </main>
+  </body>
 </html>

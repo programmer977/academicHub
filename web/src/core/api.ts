@@ -28,5 +28,16 @@ export async function apiFetch<T>(path: string,options: RequestInit = {}): Promi
     if (response.status === 204) {
         return undefined as T;
     }
+    if (
+    response.status === 401 &&
+    token !== null &&
+    token === getAccessToken()
+) {
+    clearSession();
+    window.dispatchEvent(
+        new Event("session-expired")
+    );
+}
     return await response.json() as T;
+
 }

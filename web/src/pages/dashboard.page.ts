@@ -23,13 +23,11 @@ export async function renderDashboard(root: HTMLElement): Promise<void> {
             <ul id="subject-averages"></ul>
         </section>
     `;
-    const welcome =root.querySelector<HTMLElement>("#welcome");
-    const subjectCount =root.querySelector<HTMLElement>("#subject-count");
-    const subjectsList =root.querySelector<HTMLUListElement>("#subjects-list");
-    const statistics = requireElement<HTMLElement>(root, "#statistics");
-    const deadlinesList = requireElement<HTMLUListElement>(root, "#upcoming-deadlines");
-    const averagesList = requireElement<HTMLUListElement>(root, "#subject-averages");
-    if (!welcome || !subjectCount || !subjectsList|| !statistics || !deadlinesList || !averagesList) {
+    const welcome = requireElement<HTMLElement>(root,"#welcome");
+    const statistics = requireElement<HTMLElement>(root,"#statistics");
+    const deadlinesList = requireElement<HTMLUListElement>(root,"#upcoming-deadlines");
+    const averagesList = requireElement<HTMLUListElement>(root,"#subject-averages");
+    if (!welcome ||!statistics || !deadlinesList || !averagesList) {
         throw new Error("Elementos do Dashboard não encontrados");
     }
     const [user,subjects,activities,assessments,deadlines] = await Promise.all([
@@ -40,12 +38,6 @@ export async function renderDashboard(root: HTMLElement): Promise<void> {
     listDeadlines()
 ]);
     welcome.textContent = `Bem-vindo, ${user.name}`;
-    subjectCount.textContent = String(subjects.length);
-    for (const subject of subjects) {
-        const item = document.createElement("li");
-        item.textContent = subject.name;
-        subjectsList.appendChild(item);
-    }
     const pendingActivities = activities.filter(activity => activity.status !== "completed").length;
     const completedActivities = activities.filter(activity => activity.status === "completed").length;
     const pendingAssessments = assessments.filter(assessment => assessment.grade === null).length;

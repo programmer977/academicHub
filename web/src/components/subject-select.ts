@@ -4,7 +4,7 @@ export function populateSubjectSelect(select: HTMLSelectElement,subjects: Subjec
     select.replaceChildren();
     const placeholder = document.createElement("option");
     placeholder.value = "";
-    placeholder.textContent = "Selecione uma disciplina";
+    placeholder.textContent = "Select a subject";
     placeholder.disabled = true;
     placeholder.selected = true;
     select.appendChild(placeholder);

@@ -7,18 +7,18 @@ import {formatDate} from "../utils/dates.ts";
 export async function renderSubjectDetail(root: HTMLElement,subjectId: string): Promise<void> {
     root.innerHTML = `
         <section>
-            <a href="#/subjects">Voltar</a>
-            <h2 id="subject-name">Carregando...</h2>
+            <a href="#/subjects">Back</a>
+            <h2 id="subject-name">Loading...</h2>
             <p id="subject-description"></p>
-            <h3>Média atual</h3>
+            <h3>Current average</h3>
             <strong id="subject-average">...</strong>
         </section>
         <section>
-            <h2>Atividades</h2>
+            <h2>Activities</h2>
             <ul id="activities-list"></ul>
         </section>
         <section>
-            <h2>Avaliações</h2>
+            <h2>Assessments</h2>
             <ul id="assessments-list"></ul>
         </section>
     `;
@@ -35,8 +35,8 @@ export async function renderSubjectDetail(root: HTMLElement,subjectId: string): 
         const description = requireElement<HTMLElement>(root, "#subject-description");
         const averageElement = requireElement<HTMLElement>(root, "#subject-average");
         name.textContent = subject.name;
-        description.textContent =subject.description ?? "Sem descrição.";
-        averageElement.textContent =average === null? "Ainda não há avaliações corrigidas.": average.toFixed(2);
+        description.textContent =subject.description ?? "No description.";
+        averageElement.textContent =average === null? "No graded assessments yet.": average.toFixed(2);
         const activitiesList =requireElement<HTMLUListElement>(root, "#activities-list");
         for (const activity of subjectActivities) {
             const item = document.createElement("li");
@@ -45,19 +45,19 @@ export async function renderSubjectDetail(root: HTMLElement,subjectId: string): 
         }
         if (subjectActivities.length === 0) {
             const item = document.createElement("li");
-            item.textContent = "Nenhuma atividade cadastrada.";
+            item.textContent = "No activities added yet.";
             activitiesList.appendChild(item);
         }
         const assessmentsList =requireElement<HTMLUListElement>(root, "#assessments-list");
         for (const assessment of subjectAssessments) {
             const item = document.createElement("li");
-            const grade =assessment.grade === null? "Sem nota": assessment.grade.toFixed(2);
-            item.textContent =`${assessment.title} — ${grade} — Peso ${assessment.weight}`;
+            const grade =assessment.grade === null? "Ungraded": assessment.grade.toFixed(2);
+            item.textContent =`${assessment.title} — ${grade} — Weight ${assessment.weight}`;
             assessmentsList.appendChild(item);
         }
         if (subjectAssessments.length === 0) {
             const item = document.createElement("li");
-            item.textContent = "Nenhuma avaliação cadastrada.";
+            item.textContent = "No assessments added yet.";
             assessmentsList.appendChild(item);
         }
 }

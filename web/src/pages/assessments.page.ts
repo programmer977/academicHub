@@ -9,25 +9,25 @@ import type { Subject } from "../types/subject.ts";
 export async function renderAssessments(root: HTMLElement): Promise<void> {
     root.innerHTML = `
         <section>
-            <h2>Gerenciar avaliações</h2>
+            <h2>Manage assessments</h2>
             <form id="assessment-form">
-                <label for="subject">Disciplina</label>
+                <label for="subject">Subject</label>
                 <select id="subject" required></select>
-                <label for="title">Título</label>
+                <label for="title">Title</label>
                 <input id="title" maxlength="150" required>
-                <label for="grade">Nota</label>
+                <label for="grade">Grade</label>
                 <input id="grade" type="number" min="0" max="10" step="0.01">
-                <label for="weight">Peso</label>
+                <label for="weight">Weight</label>
                 <input id="weight" type="number" min="1" max="10" step="1" value="1" required>
-                <label for="dueAt">Data da avaliação</label>
+                <label for="dueAt">Assessment date</label>
                 <input id="dueAt" type="datetime-local" required>
-                <button id="save-button" type="submit">Salvar avaliação</button>
-                <button id="cancel-button" type="button" hidden>Cancelar edição</button>
+                <button id="save-button" type="submit">Save assessment</button>
+                <button id="cancel-button" type="button" hidden>Cancel editing</button>
             </form>
             <p id="feedback" role="status"></p>
         </section>
         <section>
-            <h2>Minhas avaliações</h2>
+            <h2>My assessments</h2>
             <ul id="assessments-list"></ul>
         </section>
     `;
@@ -53,18 +53,18 @@ function readForm(): CreateAssessmentInput {
     const grade =gradeInput.value === ""? null: gradeInput.valueAsNumber;
     const weight = weightInput.valueAsNumber;
     if (title.length < 1 || title.length > 150) {
-        throw new Error("Título inválido.");
+        throw new Error("Invalid title.");
     }
     if (!subjects.some(subject => subject.id === subjectId)) {
-        throw new Error("Selecione uma disciplina válida.");
+        throw new Error("Select a valid subject.");
     }
     if (grade !== null &&(!Number.isFinite(grade) ||grade < 0 ||grade > 10 ||Math.abs(grade * 100 - Math.round(grade * 100)) >= 1e-8)) {
-        throw new Error("A nota deve estar entre 0 e 10, com até duas casas decimais.");}
+        throw new Error("The grade must be between 0 and 10, with up to two decimal places.");}
     if (!Number.isInteger(weight) ||weight < 1 ||weight > 10) {
-        throw new Error("O peso deve ser um inteiro entre 1 e 10.");
+        throw new Error("The weight must be an integer between 1 and 10.");
     }
     if (!dueAtInput.value) {
-        throw new Error("Informe a data da avaliação.");
+        throw new Error("Enter the assessment date.");
     }
     return {subjectId,title,grade,weight,dueAt: toIsoDate(dueAtInput.value)};
 }
@@ -83,7 +83,7 @@ function renderAssessmentList(): void {
     list.replaceChildren();
     if (assessments.length === 0) {
         const empty = document.createElement("li");
-        empty.textContent ="Nenhuma avaliação cadastrada.";
+        empty.textContent ="No assessments added yet.";
         list.appendChild(empty);
         return;
     }
@@ -96,18 +96,18 @@ function renderAssessmentList(): void {
         const weight = document.createElement("p");
         const date = document.createElement("p");
         title.textContent = assessment.title;
-        subject.textContent =subjectNames.get(assessment.subjectId)?? "Disciplina indisponível";
-        grade.textContent =assessment.grade === null? "Nota: aguardando correção": `Nota: ${assessment.grade.toFixed(2)}`;
-        weight.textContent =`Peso: ${assessment.weight}`;
-        date.textContent =`Data: ${formatDate(assessment.dueAt)}`;
+        subject.textContent =subjectNames.get(assessment.subjectId)?? "Subject unavailable";
+        grade.textContent =assessment.grade === null? "Grade: awaiting grading": `Grade: ${assessment.grade.toFixed(2)}`;
+        weight.textContent =`Weight: ${assessment.weight}`;
+        date.textContent =`Date: ${formatDate(assessment.dueAt)}`;
         const editButton = document.createElement("button");
         editButton.type = "button";
-        editButton.textContent = "Editar";
+        editButton.textContent = "Edit";
         editButton.disabled = busy;
         editButton.addEventListener("click", () => {startEditing(assessment);});
         const deleteButton = document.createElement("button");
         deleteButton.type = "button";
-        deleteButton.textContent = "Excluir";
+        deleteButton.textContent = "Delete";
         deleteButton.disabled = busy;
         deleteButton.addEventListener("click", () => {void removeAssessment(assessment);});
         item.append(title,subject,grade,weight,date,editButton,deleteButton);
@@ -126,7 +126,7 @@ function startEditing(assessment: Assessment): void {
     gradeInput.value =assessment.grade === null? "": String(assessment.grade);
     weightInput.value =String(assessment.weight);
     dueAtInput.value =toLocalDateTimeInput(assessment.dueAt);
-    saveButton.textContent = "Atualizar avaliação";
+    saveButton.textContent = "Update assessment";
     cancelButton.hidden = false;
     feedback.textContent = "";
     titleInput.focus();
@@ -135,28 +135,28 @@ function resetForm(): void {
     editingAssessmentId = null;
     form.reset();
     subjectSelect.value = "";
-    saveButton.textContent = "Salvar avaliação";
+    saveButton.textContent = "Save assessment";
     cancelButton.hidden = true;
 }
 form.addEventListener("submit", async event => {
     event.preventDefault();
     if (busy) return;
     setBusy(true);
-    feedback.textContent = "Salvando avaliação...";
+    feedback.textContent = "Saving assessment...";
     try {
         const data = readForm();
         let message: string;
         if (editingAssessmentId === null) {
             await createAssessment(data);
-            message = "Avaliação cadastrada.";
+            message = "Assessment created.";
         } else {
             await updateAssessment(editingAssessmentId,data);
-            message = "Avaliação atualizada.";
+            message = "Assessment updated.";
         }
         resetForm();
         await refreshAfterMutation(message);
     } catch (error) {
-        feedback.textContent =error instanceof Error? error.message: "Não foi possível salvar a avaliação.";
+        feedback.textContent =error instanceof Error? error.message: "Unable to save the assessment.";
     } finally {setBusy(false);}
 });
 async function refreshAfterMutation(message: string): Promise<void> {
@@ -164,12 +164,12 @@ async function refreshAfterMutation(message: string): Promise<void> {
         await loadAssessments();
         feedback.textContent = message;
     } catch {
-        feedback.textContent =`${message} Não foi possível atualizar a listagem.`;
+        feedback.textContent =`${message} Unable to refresh the list.`;
     }
 }
 async function removeAssessment(assessment: Assessment): Promise<void> {
     if (busy) return;
-    const confirmed = window.confirm(`Excluir "${assessment.title}"?`);
+    const confirmed = window.confirm(`Delete "${assessment.title}"?`);
     if (!confirmed) return;
     setBusy(true);
     try {
@@ -177,10 +177,10 @@ async function removeAssessment(assessment: Assessment): Promise<void> {
         if (editingAssessmentId === assessment.id) {
             resetForm();
         }
-        await refreshAfterMutation("Avaliação excluída."
+        await refreshAfterMutation("Assessment deleted."
         );
     } catch (error) {
-        feedback.textContent =error instanceof Error? error.message: "Erro ao excluir avaliação.";
+        feedback.textContent =error instanceof Error? error.message: "Unable to delete the assessment.";
     } finally {setBusy(false);}
 }
 cancelButton.addEventListener("click", () => {
@@ -196,10 +196,10 @@ try {
     renderAssessmentList();
     if (subjects.length === 0) {
         feedback.textContent =
-            "Cadastre uma disciplina antes de criar avaliações.";
+            "Create a subject before adding assessments.";
     }
 } catch (error) {
-    feedback.textContent =error instanceof Error? error.message: "Não foi possível carregar a página.";
+    feedback.textContent =error instanceof Error? error.message: "Unable to load the page.";
 } finally {
     setBusy(false);
 }

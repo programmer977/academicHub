@@ -4,16 +4,16 @@ import { setAccessToken } from "../core/session.ts";
 export function renderLogin(root: HTMLElement): void {
     root.innerHTML = `
         <section>
-            <h2>Entrar</h2>
+            <h2>Log in</h2>
             <form id="login-form">
                 <label for="email">Email</label>
                 <input id="email" name="email" type="email" autocomplete="username" required>
-                <label for="password">Senha</label>
+                <label for="password">Password</label>
                 <input  id="password" name="password" type="password"  autocomplete="current-password" required>
-                <button type="submit">Entrar</button>
+                <button type="submit">Log in</button>
             </form>
             <p id="feedback" role="status"></p>
-            <a href="#/register">Criar uma conta</a>
+            <a href="#/register">Create an account</a>
         </section>
     `;
     const form =root.querySelector<HTMLFormElement>("#login-form");
@@ -21,7 +21,7 @@ export function renderLogin(root: HTMLElement): void {
     const button =root.querySelector<HTMLButtonElement>("button");
 
     if (!form || !feedback || !button) {
-        throw new Error("Elementos do login não encontrados");
+        throw new Error("Login form elements not found");
     }
 
     form.addEventListener("submit", async (event) => {
@@ -30,7 +30,7 @@ export function renderLogin(root: HTMLElement): void {
         const email = String(data.get("email") ?? "");
         const password = String(data.get("password") ?? "");
         button.disabled = true;
-        feedback.textContent = "Autenticando...";
+        feedback.textContent = "Logging in...";
         try {
             const response = await login({email,password});
             if (!root.isConnected) {
@@ -40,7 +40,7 @@ export function renderLogin(root: HTMLElement): void {
             form.reset();
             window.location.hash = "/dashboard";
         } catch (error) {
-            feedback.textContent =error instanceof Error? error.message: "Falha na autenticação.";
+            feedback.textContent =error instanceof Error? error.message: "Authentication failed.";
         } finally {
             button.disabled = false;
         }

@@ -2,20 +2,20 @@ import { register } from "../services/auth.service.ts";
 export function renderRegister(root: HTMLElement): void {
     root.innerHTML = `
         <section>
-            <h2>Criar conta</h2>
+            <h2>Create account</h2>
             <form id="register-form">
-                <label for="name">Nome</label>
+                <label for="name">Name</label>
                 <input id="name" name="name"  minlength="2"  maxlength="100"  autocomplete="name" required>
                 <label for="email">Email</label>
                 <input  id="email" name="email" type="email" maxlength="254" autocomplete="email" required>
-                <label for="password">Senha</label>
+                <label for="password">Password</label>
                 <input id="password"  name="password" type="password" minlength="12"  maxlength="128"  autocomplete="new-password" required>
-                <label for="confirmation">Confirmar senha</label>
+                <label for="confirmation">Confirm password</label>
                 <input id="confirmation" name="confirmation" type="password" autocomplete="new-password" required>
-                <button type="submit">Criar conta</button>
+                <button type="submit">Create account</button>
             </form>
             <p id="feedback" role="status"></p>
-            <a href="#/login">Já possui uma conta? Entrar</a>
+            <a href="#/login">Already have an account? Log in</a>
         </section>
     `;
 
@@ -24,7 +24,7 @@ export function renderRegister(root: HTMLElement): void {
     const button = root.querySelector<HTMLButtonElement>("button");
 
     if (!form || !feedback || !button) {
-        throw new Error("Elementos do cadastro não encontrados");
+        throw new Error("Registration form elements not found");
     }
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -34,11 +34,11 @@ export function renderRegister(root: HTMLElement): void {
         const password = String(data.get("password") ?? "");
         const confirmation =String(data.get("confirmation") ?? "");
         if (password !== confirmation) {
-            feedback.textContent ="As senhas não coincidem.";
+            feedback.textContent ="Passwords do not match.";
             return;
         }
         button.disabled = true;
-        feedback.textContent = "Criando conta...";
+        feedback.textContent = "Creating account...";
         try {
             await register({name,email,password});
             form.reset();
@@ -46,7 +46,7 @@ export function renderRegister(root: HTMLElement): void {
                 window.location.hash = "/login";
             }
         } catch (error) {
-            feedback.textContent =error instanceof Error? error.message: "Não foi possível criar a conta.";
+            feedback.textContent =error instanceof Error? error.message: "Unable to create the account.";
         } finally {
             button.disabled = false;
         }

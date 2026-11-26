@@ -11,15 +11,15 @@ import {formatDate} from "../utils/dates.ts";
 export async function renderDashboard(root: HTMLElement): Promise<void> {
     root.innerHTML = `
         <section>
-            <h2 id="welcome">Dashboard acadêmico</h2>
+            <h2 id="welcome">Academic dashboard</h2>
             <div id="statistics" class="dashboard-grid"></div>
         </section>
         <section>
-            <h2>Próximos prazos</h2>
+            <h2>Upcoming deadlines</h2>
             <ul id="upcoming-deadlines"></ul>
         </section>
         <section>
-            <h2>Desempenho acadêmico</h2>
+            <h2>Academic performance</h2>
             <ul id="subject-averages"></ul>
         </section>
     `;
@@ -28,7 +28,7 @@ export async function renderDashboard(root: HTMLElement): Promise<void> {
     const deadlinesList = requireElement<HTMLUListElement>(root,"#upcoming-deadlines");
     const averagesList = requireElement<HTMLUListElement>(root,"#subject-averages");
     if (!welcome ||!statistics || !deadlinesList || !averagesList) {
-        throw new Error("Elementos do Dashboard não encontrados");
+        throw new Error("Dashboard elements not found");
     }
     const [user,subjects,activities,assessments,deadlines] = await Promise.all([
     getProfile(),
@@ -37,7 +37,7 @@ export async function renderDashboard(root: HTMLElement): Promise<void> {
     listAssessments(),
     listDeadlines()
 ]);
-    welcome.textContent = `Bem-vindo, ${user.name}`;
+    welcome.textContent = `Welcome, ${user.name}`;
     const pendingActivities = activities.filter(activity => activity.status !== "completed").length;
     const completedActivities = activities.filter(activity => activity.status === "completed").length;
     const pendingAssessments = assessments.filter(assessment => assessment.grade === null).length;
@@ -50,12 +50,12 @@ export async function renderDashboard(root: HTMLElement): Promise<void> {
         return {subjectId: subject.id,subjectName: subject.name,average};
     }));
     statistics.append(
-    createStatisticCard("Disciplinas",subjects.length),
-    createStatisticCard("Atividades pendentes",pendingActivities),
-    createStatisticCard("Atividades concluídas",completedActivities),
-    createStatisticCard("Atividades atrasadas",overdueActivities),
-    createStatisticCard("Avaliações sem nota",pendingAssessments),
-    createStatisticCard("Taxa de conclusão",activities.length === 0? "Sem atividades": `${completionRate.toFixed(1)}%`)
+    createStatisticCard("Subjects",subjects.length),
+    createStatisticCard("Pending activities",pendingActivities),
+    createStatisticCard("Completed activities",completedActivities),
+    createStatisticCard("Overdue activities",overdueActivities),
+    createStatisticCard("Ungraded assessments",pendingAssessments),
+    createStatisticCard("Completion rate",activities.length === 0? "No activities": `${completionRate.toFixed(1)}%`)
 );
 for (const deadline of upcomingDeadlines) {
     const item = document.createElement("li");
@@ -64,7 +64,7 @@ for (const deadline of upcomingDeadlines) {
 }
 if (upcomingDeadlines.length === 0) {
     const item = document.createElement("li");
-    item.textContent = "Nenhum próximo prazo na lista.";
+    item.textContent = "No upcoming deadlines in the list.";
     deadlinesList.appendChild(item);
 }
 for (const subject of subjectAverages) {
@@ -73,13 +73,13 @@ for (const subject of subjectAverages) {
     const average = document.createElement("span");
     link.href = `#/subjects/${subject.subjectId}`;
     link.textContent = subject.subjectName;
-    average.textContent =subject.average === null? " — Sem notas": ` — Média: ${subject.average.toFixed(2)}`;
+    average.textContent =subject.average === null? " — No grades yet": ` — Average: ${subject.average.toFixed(2)}`;
     item.append(link, average);
     averagesList.appendChild(item);
 }
 if (subjectAverages.length === 0) {
     const item = document.createElement("li");
-    item.textContent = "Nenhuma disciplina cadastrada.";
+    item.textContent = "No subjects added yet.";
     averagesList.appendChild(item);
 }
 }

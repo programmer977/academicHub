@@ -2,7 +2,7 @@ export function requireElement<T extends Element>(root: ParentNode,selector: str
     const element = root.querySelector<T>(selector);
     if (!element) {
         throw new Error(
-            `Elemento não encontrado: ${selector}`
+            `Element not found: ${selector}`
         );
     }
     return element;

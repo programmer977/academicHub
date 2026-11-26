@@ -22,7 +22,7 @@ const routes = new Map<string, PageRenderer>([
 export async function router(): Promise<void> {
     const app = document.querySelector<HTMLElement>("#app");
     if (!app) {
-        throw new Error("Elemento principal não encontrado");
+        throw new Error("Main application element not found");
     }
     const path =window.location.hash.slice(1) || "/dashboard";
     const publicRoute =path === "/login" || path === "/register";
@@ -53,13 +53,13 @@ export async function router(): Promise<void> {
         const nav = document.createElement("nav");
         nav.innerHTML = `
                 <a href="#/dashboard">Dashboard</a>
-                <a href="#/subjects">Disciplinas</a>
-                <a href="#/activities">Atividades</a>
-                <a href="#/assessments">Avaliações</a>
-                <a href="#/deadlines">Prazos</a>
+                <a href="#/subjects">Subjects</a>
+                <a href="#/activities">Activities</a>
+                <a href="#/assessments">Assessments</a>
+                <a href="#/deadlines">Deadlines</a>
 
                 <button type="button" id="logout-button">
-                    Sair
+                    Log out
                 </button>
             `;
         const logoutButton =nav.querySelector<HTMLButtonElement>("#logout-button");
@@ -76,7 +76,7 @@ export async function router(): Promise<void> {
         await render(page);
     } catch (error) {
         if (page.isConnected) {
-            page.textContent =error instanceof Error? error.message: "Não foi possível carregar a página.";
+            page.textContent =error instanceof Error? error.message: "Unable to load the page.";
         }
     }
 }

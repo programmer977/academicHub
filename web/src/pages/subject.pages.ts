@@ -4,19 +4,19 @@ import type { Subject } from "../types/subject.ts";
 export async function renderSubjects(root: HTMLElement): Promise<void> {
     root.innerHTML = `
         <section>
-            <h2>Minhas disciplinas</h2>
+            <h2>My subjects</h2>
             <form id="subject-form">
-                <label for="name">Nome</label>
+                <label for="name">Name</label>
                 <input id="name" name="name" maxlength="120" required>
-                <label for="description">Descrição</label>
+                <label for="description">Description</label>
                 <textarea id="description" name="description"  maxlength="1200"></textarea>
-                <button type="submit" id="save-button">Salvar disciplina</button>
-                <button type="button" id="cancel-button">Cancelar edição</button>
+                <button type="submit" id="save-button">Save subject</button>
+                <button type="button" id="cancel-button">Cancel editing</button>
             </form>
             <p id="feedback" role="status"></p>
         </section>
         <section>
-            <h2>Disciplinas cadastradas</h2>
+            <h2>Saved subjects</h2>
             <ul id="subjects-list"></ul>
         </section>
     `;
@@ -29,7 +29,7 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
     const cancelButton =root.querySelector<HTMLButtonElement>("#cancel-button");
 
     if (!form ||!nameInput ||!descriptionInput ||!subjectsList ||!feedback ||!saveButton ||!cancelButton) 
-    {throw new Error("Elementos da página não encontrados");}
+    {throw new Error("Page elements not found");}
     let editingSubjectId: string | null = null;
     let busy = false;
 
@@ -44,7 +44,7 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
     function resetForm(): void {
         editingSubjectId = null;
         form!.reset();
-        saveButton!.textContent = "Salvar disciplina";
+        saveButton!.textContent = "Save subject";
         cancelButton!.hidden = true;
     }
     function startEditing(subject: Subject): void {
@@ -52,13 +52,13 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
         editingSubjectId = subject.id;
         nameInput!.value = subject.name;
         descriptionInput!.value =subject.description ?? "";
-        saveButton!.textContent = "Atualizar disciplina";
+        saveButton!.textContent = "Update subject";
         cancelButton!.hidden = false;
         nameInput!.focus();
     }
     async function removeSubject(subject: Subject): Promise<void> {
         if (busy) return;
-        const confirmed = window.confirm(`Excluir "${subject.name}" e todas as suas atividades e avaliações?`);
+        const confirmed = window.confirm(`Delete "${subject.name}" and all its activities and assessments?`);
         if (!confirmed) return;
         setBusy(true);
         try {
@@ -66,10 +66,10 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
             if (editingSubjectId === subject.id) {
                 resetForm();
             }
-            feedback!.textContent = "Disciplina excluída.";
+            feedback!.textContent = "Subject deleted.";
             await loadSubjects();
         } catch (error) {
-            feedback!.textContent =error instanceof Error? error.message: "Erro ao excluir disciplina.";
+            feedback!.textContent =error instanceof Error? error.message: "Unable to delete the subject.";
         } finally {
             setBusy(false);
         }
@@ -77,17 +77,17 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
     function renderSubject(subject: Subject): void {
         const detailLink = document.createElement("a");
         detailLink.href =`#/subjects/${subject.id}`;
-        detailLink.textContent ="Visualizar disciplina";
+        detailLink.textContent ="View subject";
         const item = document.createElement("li");
         const title = document.createElement("h3");
         const description = document.createElement("p");
         const editButton = document.createElement("button");
         const deleteButton = document.createElement("button");
         title.textContent = subject.name;
-        description.textContent =subject.description ?? "Sem descrição";
-        editButton.textContent = "Editar";
+        description.textContent =subject.description ?? "No description";
+        editButton.textContent = "Edit";
         editButton.type = "button";
-        deleteButton.textContent = "Excluir";
+        deleteButton.textContent = "Delete";
         deleteButton.type = "button";
         editButton.addEventListener("click", () => {startEditing(subject);
         });
@@ -100,14 +100,14 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
     async function loadSubjects(): Promise<void> {
         subjectsList!.replaceChildren();
         const loading = document.createElement("li");
-        loading.textContent = "Carregando disciplinas...";
+        loading.textContent = "Loading subjects...";
         subjectsList!.appendChild(loading);
         try {
             const subjects = await listSubjects();
             subjectsList!.replaceChildren();
             if (subjects.length === 0) {
                 const empty = document.createElement("li");
-                empty.textContent ="Nenhuma disciplina cadastrada.";
+                empty.textContent ="No subjects added yet.";
                 subjectsList!.appendChild(empty);
                 return;
             }
@@ -115,7 +115,7 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
                 renderSubject(subject);
             }
         } catch {
-            loading.textContent ="Não foi possível carregar as disciplinas.";
+            loading.textContent ="Unable to load subjects.";
         }
     }
     form.addEventListener("submit", async (event) => {
@@ -126,25 +126,25 @@ export async function renderSubjects(root: HTMLElement): Promise<void> {
             description:descriptionInput.value.trim() || null
         };
         if (data.name.length === 0) {
-            feedback.textContent ="Informe o nome da disciplina.";
+            feedback.textContent ="Enter the subject name.";
             return;
         }
         setBusy(true);
         try {
             if (editingSubjectId === null) {
                 await createSubject(data);
-                feedback.textContent ="Disciplina cadastrada.";
+                feedback.textContent ="Subject created.";
             } else {
                 await updateSubject(
                     editingSubjectId,
                     data
                 );
-                feedback.textContent ="Disciplina atualizada.";
+                feedback.textContent ="Subject updated.";
             }
             resetForm();
             await loadSubjects();
         } catch (error) {
-            feedback.textContent =error instanceof Error? error.message: "Não foi possível salvar a disciplina.";
+            feedback.textContent =error instanceof Error? error.message: "Unable to save the subject.";
         } finally {
 
             setBusy(false);

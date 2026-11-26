@@ -23,7 +23,7 @@ export async function apiFetch<T>(path: string,options: RequestInit = {}): Promi
             clearSession();
             window.dispatchEvent(new Event("session-expired"));
         }
-        throw new ApiError(response.status,body?.message ?? "Falha na requisição");
+        throw new ApiError(response.status,body?.message ?? "Request failed");
     }
     if (response.status === 204) {
         return undefined as T;

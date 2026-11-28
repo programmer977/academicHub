@@ -1,544 +1,149 @@
-# Academic Hub
+# AcademicHub
 
+[![CI](https://github.com/programmer977/academicHub/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/programmer977/academicHub/actions/workflows/ci.yml)
 ![Node.js](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![Fastify](https://img.shields.io/badge/Fastify-5-000000?logo=fastify&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
-![Status](https://img.shields.io/badge/status-active%20development-orange)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Render](https://img.shields.io/badge/Deployed%20on-Render-000000?logo=render&logoColor=white)
 
-> A full-stack academic management application that brings university subjects, coursework, assessments, grades, and deadlines together in a single workspace.
+> A full-stack academic management application for organizing university subjects, coursework, assessments, grades, and deadlines in a single workspace.
 
-**Status:** Core backend and web interface implemented · Active development · Not production-ready
+**Project status:** Deployed on Render · Active development.
 
 ## Overview
 
-University students often manage several subjects at once, each with different assignments, exams, grading criteria, and deadlines. Keeping track of this information across learning platforms, spreadsheets, and personal notes creates unnecessary friction.
+University students often manage multiple subjects, assignments, exams, grading criteria, and deadlines across different learning platforms, spreadsheets, and personal notes. AcademicHub centralizes these responsibilities into a single application, helping students track their academic progress and understand their performance.
 
-Academic Hub addresses this problem by providing a centralized workspace where students can organize their academic responsibilities, monitor progress, and calculate weighted grades.
+The project consists of a versioned REST API built with Node.js, TypeScript, and Fastify, a relational PostgreSQL database, and a framework-free TypeScript single-page application powered by Vite.
 
-The application consists of a versioned REST API built with Node.js, TypeScript, and Fastify, a PostgreSQL database, and a framework-free TypeScript web client powered by Vite. The current user interface is written in Brazilian Portuguese (pt-BR).
-
-## Table of Contents
-
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Available Scripts](#available-scripts)
-- [REST API](#rest-api)
-- [Academic Rules and Data Model](#academic-rules-and-data-model)
-- [Automated Testing](#automated-testing)
-- [Security](#security)
-- [Known Limitations](#known-limitations)
-- [Development Roadmap](#development-roadmap)
-- [Author and License](#author-and-license)
+AcademicHub also serves as a practical software engineering project covering relational modeling, API design, authentication, authorization, automated testing, containerization, continuous integration, and cloud deployment.
 
 ## Features
 
-### Authentication and Account Management
-
-- Register an account and sign in using email and password.
-- Retrieve the authenticated user's profile.
-- Protect academic resources through JWT authentication and ownership-scoped database queries.
-- Sign out through the web interface.
-- Redirect unauthenticated users to the login page and handle expired sessions.
-
-### Academic Dashboard
-
-The dashboard consolidates information from the API into a student-oriented overview:
-
-- Total registered subjects.
-- Pending, completed, and overdue activities.
-- Assessments awaiting grades.
-- Activity completion rate.
-- Up to five upcoming deadlines from the API's deadline list.
-- Weighted average for each subject, with links to individual subject details.
-
-### Subject Management
-
-- Create, view, update, and delete subjects.
-- Associate activities and assessments with a subject.
-- Open a subject detail page to review its description, current average, activities, and assessments.
-- Keep each user's academic records isolated from those of other users.
-
-### Activity Management
-
-- Create, list, edit, and delete assignments and coursework.
-- Assign a subject, name, optional description, deadline, and progress status.
-- Filter activities by status in the web interface.
-- Mark activities as completed directly from the activity list.
-
-Supported statuses: `pending`, `in_progress`, and `completed`.
-
-### Assessments and Grades
-
-- Create, list, edit, and delete assessments.
-- Define the associated subject, title, due date, grade, and weight.
-- Leave grades unset until assessments have been graded.
-- Calculate weighted subject averages automatically through the backend.
-- View academic performance from the dashboard and subject detail pages.
-
-### Academic Deadlines
-
-The backend combines incomplete activities and ungraded assessments into a single chronological list. It returns up to 50 entries, including overdue records.
-
-The web client classifies each deadline according to the time remaining:
-
-| Status | Time remaining |
+| Feature | Description |
 | --- | --- |
-| Overdue | Deadline has passed |
-| Urgent | 24 hours or less |
-| Upcoming | More than 24 hours and up to 7 days |
-| Future | More than 7 days |
-
-### Web Application
-
-The frontend is a single-page application (SPA) built with native TypeScript, HTML, and CSS, without React or another UI framework. It includes hash-based navigation, reusable UI components, responsive layout rules, typed API services, form validation, and loading/error feedback.
-
-| Browser route | Purpose |
-| --- | --- |
-| `#/login` | Sign in |
-| `#/register` | Create an account |
-| `#/dashboard` | Academic overview |
-| `#/subjects` | Manage subjects |
-| `#/subjects/:id` | View subject details and performance |
-| `#/activities` | Manage coursework |
-| `#/assessments` | Manage assessments and grades |
-| `#/deadlines` | Review academic deadlines |
-
-## Technology Stack
-
-| Layer | Technologies |
-| --- | --- |
-| Runtime | Node.js 24 |
-| Language | TypeScript |
-| Backend | Fastify 5, REST, native ES modules |
-| Frontend | Vanilla TypeScript, HTML5, CSS3, Vite 8 |
-| Database | PostgreSQL 17 |
-| Data access | `pg` (node-postgres), parameterized SQL |
-| Migrations | `node-pg-migrate` |
-| Validation | Zod 4, `fastify-type-provider-zod` |
-| Authentication | `@fastify/jwt`, Argon2id |
-| API documentation | OpenAPI / Swagger UI |
-| Local infrastructure | Docker Compose |
-| Testing | Node.js test runner, `tsx`, Fastify `app.inject()` |
-| Version control | Git and GitHub |
-
-## Architecture
-
-Academic Hub uses a modular backend and a separate web client. The frontend communicates with the backend through HTTP requests rather than accessing the database directly.
-
-```mermaid
-flowchart TD
-    U[Student] --> W[TypeScript SPA]
-    W --> C[Typed API services / Fetch client]
-    C -->|HTTP / JSON| R[Fastify REST API]
-    R --> V[Zod validation / JWT authentication]
-    V --> S[Academic services]
-    S --> P[Repositories]
-    V --> A[Authentication routes]
-    P --> D[(PostgreSQL)]
-    A --> D
-```
-
-### Backend
-
-The academic modules follow a layered structure:
-
-`Routes → Services → Repositories → PostgreSQL`
-
-- **Routes:** Define HTTP endpoints, validation schemas, authentication guards, and response handling.
-- **Services:** Coordinate academic operations and business logic, including weighted grade calculation.
-- **Repositories:** Execute parameterized SQL, scope queries to resource owners, and map database records into API responses.
-- **Authentication:** Uses dedicated routes, schemas, JWT guards, and password utilities. Its routes currently access the database directly.
-- **Application bootstrap:** `src/app.ts` constructs the Fastify application using an injected database pool and JWT secret; `src/server.ts` initializes the HTTP server. This separation supports integration tests without opening a network listener.
-
-### Frontend
-
-The web application separates page rendering, API communication, session management, types, and reusable components.
-
-- **Router:** Resolves hash-based routes and controls public and authenticated navigation.
-- **Pages:** Render views, handle form submissions, and coordinate user interactions.
-- **Services:** Encapsulate requests to specific REST resources.
-- **API client:** Adds bearer tokens, handles JSON and HTTP errors, and clears the session when an authenticated request returns `401`.
-- **Session:** Keeps the access token in JavaScript memory rather than persistent browser storage.
-- **Components and utilities:** Provide reusable statistic cards, subject selection, date formatting, and deadline classification.
-
-During local development, Vite proxies `/api` requests to `http://localhost:3000`. A separate deployment configuration is required for production hosting.
-
-## Project Structure
-
-```text
-academicHub/
-├── .env.example
-├── .env.test.example
-├── .node-version
-├── compose.yaml
-├── package.json
-├── package-lock.json
-├── tsconfig.json
-├── README.md
-│
-├── migrations/
-│   └── 1793226435441_initial-schema.ts
-│
-├── src/                           # Backend
-│   ├── app.ts                     # Fastify application factory
-│   ├── server.ts                  # HTTP server entry point
-│   ├── config/
-│   │   └── env.ts
-│   ├── database/
-│   │   └── db.ts
-│   ├── modules/
-│   │   ├── auth/
-│   │   ├── subjects/              # Includes deadline aggregation
-│   │   ├── activities/
-│   │   └── assessments/           # Includes weighted grade logic
-│   └── types/
-│       └── jwt.d.ts
-│
-├── tests/
-│   ├── helpers/
-│   │   └── test-context.ts
-│   ├── grade.test.ts
-│   ├── auth.integration.test.ts
-│   ├── authorization.integration.test.ts
-│   ├── subjects.integration.test.ts
-│   ├── activities.integration.test.ts
-│   ├── assessments.integration.test.ts
-│   ├── grades.integration.test.ts
-│   ├── deadlines.integration.test.ts
-│   └── tsconfig.json
-│
-└── web/                           # Frontend
-    ├── index.html
-    ├── package.json
-    ├── package-lock.json
-    ├── tsconfig.json
-    ├── vite.config.ts
-    └── src/
-        ├── main.ts
-        ├── router.ts
-        ├── style.css
-        ├── components/
-        ├── core/                  # API client and session management
-        ├── pages/
-        ├── services/
-        ├── types/
-        └── utils/
-```
-
-Generated backend and frontend builds are written to `dist/` and `web/dist/`, respectively.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 24, as specified in `.node-version`.
-- npm and Git.
-- Docker with the Docker Compose plugin.
-- OpenSSL (optional, for generating a JWT secret).
-
-The commands below assume a Bash-compatible terminal and the default local configuration.
-
-### 1. Clone the repository and install dependencies
-
-```bash
-git clone https://github.com/programmer977/academicHub.git
-cd academicHub
-
-npm ci
-npm --prefix web ci
-```
-
-The backend and frontend maintain separate `package.json` and lock files.
-
-### 2. Configure the environment
-
-From the repository root:
-
-```bash
-cp .env.example .env
-```
-
-The example provides the following development configuration:
-
-```dotenv
-POSTGRES_USER=academichub
-POSTGRES_PASSWORD=localDevPass123
-POSTGRES_DB=academichub
-DATABASE_URL=postgresql://academichub:localDevPass123@127.0.0.1:5433/academichub
-JWT_SECRET=replace_this_with_a_secure_random_secret_of_32_characters_or_more
-PORT=3000
-```
-
-Generate a random secret:
-
-```bash
-openssl rand -hex 32
-```
-
-Replace the placeholder `JWT_SECRET` in `.env` with the generated value. The backend requires a secret of at least 32 characters.
-
-Keep the PostgreSQL credentials consistent with `DATABASE_URL`. Never commit `.env` or use these example credentials in production. Changing credentials in `.env` does not automatically change credentials in an existing PostgreSQL volume.
-
-### 3. Start PostgreSQL
-
-```bash
-docker compose up -d db
-docker compose ps
-```
-
-Wait until the database is healthy before applying migrations.
-
-| Setting | Value |
-| --- | --- |
-| Image | `postgres:17` |
-| Host | `127.0.0.1` |
-| Host port | `5433` |
-| Container port | `5432` |
-| Persistent volume | `postgres_data` |
-
-### 4. Apply database migrations
-
-```bash
-set -a
-source .env
-set +a
-
-npm run migrate -- up
-```
-
-This creates the `users`, `subjects`, `activities`, and `assessments` tables, their constraints, and indexes.
-
-### 5. Start the backend
-
-In a terminal at the repository root:
-
-```bash
-npm run dev
-```
-
-The backend loads `.env` automatically and checks the database connection before listening for HTTP requests.
-
-### 6. Start the frontend
-
-In a second terminal at the repository root:
-
-```bash
-npm --prefix web run dev
-```
-
-Open the URL printed by Vite (normally `http://localhost:5173`). Register a new account, sign in, and create your first subject before adding activities and assessments.
-
-| Service | Local address |
-| --- | --- |
-| Web application | http://localhost:5173 |
-| REST API | http://localhost:3000/api/v1 |
-| Swagger UI | http://localhost:3000/docs |
-| PostgreSQL | `127.0.0.1:5433` |
-
-If you change the backend port, update the proxy target in `web/vite.config.ts` accordingly.
-
-## Available Scripts
-
-Run backend commands from the repository root.
-
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the backend in watch mode |
-| `npm run typecheck` | Check backend TypeScript types |
-| `npm run build` | Compile the backend to `dist/` |
-| `npm start` | Run the compiled backend |
-| `npm run migrate -- up` | Apply database migrations |
-| `npm run test:unit` | Execute weighted-grade unit tests |
-| `npm run test:integration` | Execute PostgreSQL integration tests sequentially |
-| `npm --prefix web run dev` | Start the Vite development server |
-| `npm --prefix web run build` | Type-check and build the frontend to `web/dist/` |
-| `npm --prefix web run preview` | Preview the frontend build locally |
-
-The root `npm test` script is still a placeholder. Use the explicit test scripts above.
-
-To build both application layers:
-
-```bash
-npm run typecheck
-npm run build
-npm --prefix web run build
-```
-
-The compiled backend can be started with `npm start`. The frontend build produces static files; the current backend does not register a static frontend hosting route. Vite preview is intended for local build inspection, not as a production server. A deployment must serve the frontend and route `/api` to the backend.
-
-## REST API
-
-**Base URL:** `http://localhost:3000/api/v1`
-
-**Interactive documentation:** [Swagger UI](http://localhost:3000/docs)
-
-Except for registration and login, all endpoints listed below require a valid JWT:
-
-```http
-Authorization: Bearer <ACCESS_TOKEN>
-```
-
-### Authentication
-
-| Method | Path | Description |
-| --- | --- | --- |
-| `POST` | `/auth/register` | Register a user |
-| `POST` | `/auth/login` | Authenticate and obtain a JWT |
-| `GET` | `/auth/me` | Retrieve the authenticated profile |
-
-### Subjects
-
-| Method | Path | Description |
-| --- | --- | --- |
-| `GET` | `/subjects` | List owned subjects |
-| `POST` | `/subjects` | Create a subject |
-| `GET` | `/subjects/:id` | Retrieve a subject |
-| `PATCH` | `/subjects/:id` | Update a subject |
-| `DELETE` | `/subjects/:id` | Delete a subject |
-| `GET` | `/subjects/:id/average` | Retrieve the weighted average |
-
-### Activities
-
-| Method | Path | Description |
-| --- | --- | --- |
-| `GET` | `/activities` | List activities |
-| `POST` | `/activities` | Create an activity |
-| `GET` | `/activities/:id` | Retrieve an activity |
-| `PATCH` | `/activities/:id` | Update an activity |
-| `DELETE` | `/activities/:id` | Delete an activity |
-
-### Assessments
-
-| Method | Path | Description |
-| --- | --- | --- |
-| `GET` | `/assessments` | List assessments |
-| `POST` | `/assessments` | Create an assessment |
-| `GET` | `/assessments/:id` | Retrieve an assessment |
-| `PATCH` | `/assessments/:id` | Update an assessment |
-| `DELETE` | `/assessments/:id` | Delete an assessment |
-
-### Deadlines
-
-| Method | Path | Description |
-| --- | --- | --- |
-| `GET` | `/deadlines` | List outstanding deadlines in chronological order |
-
-Resource identifiers are UUIDs. Date-time inputs use ISO 8601 with a timezone offset or UTC (`Z`). For example, `2027-04-10T09:00:00-03:00`.
-
-### Example API Workflow
-
-The examples below use `curl` and assume the backend is running locally.
-
-**1. Register an account:**
-
-```bash
-curl -i -X POST http://localhost:3000/api/v1/auth/register \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Test Student","email":"student@example.com","password":"ExamplePassword123!"}'
-```
-
-**2. Sign in:**
-
-```bash
-curl -i -X POST http://localhost:3000/api/v1/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"student@example.com","password":"ExamplePassword123!"}'
-```
-
-The response contains an access token valid for 900 seconds (15 minutes):
-
-```json
-{
-  "accessToken": "<JWT_TOKEN>",
-  "tokenType": "Bearer",
-  "expiresIn": 900
-}
-```
-
-Copy the returned token into a temporary shell variable:
-
-```bash
-TOKEN='<JWT_TOKEN>'
-```
-
-**3. Create a subject:**
-
-```bash
-curl -i -X POST http://localhost:3000/api/v1/subjects \
-  -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Computer Networks","description":"Networking fundamentals"}'
-```
-
-Copy the returned subject ID:
-
-```bash
-SUBJECT_ID='<SUBJECT_UUID>'
-```
-
-**4. Create an activity:**
-
-```bash
-curl -i -X POST http://localhost:3000/api/v1/activities \
-  -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d "{\"subjectId\":\"$SUBJECT_ID\",\"name\":\"Network topology assignment\",\"status\":\"pending\",\"dueAt\":\"2027-03-15T18:00:00-03:00\"}"
-```
-
-**5. Create an assessment:**
-
-```bash
-curl -i -X POST http://localhost:3000/api/v1/assessments \
-  -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d "{\"subjectId\":\"$SUBJECT_ID\",\"title\":\"Midterm exam\",\"grade\":8.5,\"weight\":3,\"dueAt\":\"2027-04-10T09:00:00-03:00\"}"
-```
-
-**6. Retrieve the weighted average and deadlines:**
-
-```bash
-curl -i "http://localhost:3000/api/v1/subjects/$SUBJECT_ID/average" \
-  -H "Authorization: Bearer $TOKEN"
-
-curl -i http://localhost:3000/api/v1/deadlines \
-  -H "Authorization: Bearer $TOKEN"
-```
-
-An assessment with a recorded grade is excluded from the outstanding deadline list. For an ungraded assessment, use `"grade": null` or omit the grade when creating it.
-
-## Academic Rules and Data Model
-
-### Weighted Grades
-
-Academic Hub calculates weighted subject averages on the backend:
+| Account management | Register, sign in, retrieve the authenticated profile, and sign out through the web client. |
+| Academic dashboard | View subject counts, activity progress, overdue work, assessments awaiting grades, upcoming deadlines, and subject averages. |
+| Subject management | Create, list, view, update, and delete subjects; inspect related activities and assessments. |
+| Activity management | Manage coursework with deadlines, descriptions, and progress statuses; filter activities and mark them as completed. |
+| Assessment management | Create, edit, and delete assessments with configurable weights, due dates, and optional grades. |
+| Weighted grades | Calculate subject averages on the backend using recorded grades and their respective weights. |
+| Deadline tracking | Combine incomplete activities and ungraded assessments into a chronological list, with urgency classification in the frontend. |
+| Resource isolation | Restrict academic records to their authenticated owners through server-side authorization. |
+| API documentation | Explore REST endpoints and bearer authentication using Swagger UI. |
+| Operational endpoints | Check HTTP liveness and PostgreSQL connectivity using `/health` and `/ready`. |
+
+**Activity statuses:** `pending`, `in_progress`, and `completed`.
+
+**Deadline classification:** overdue (past due), urgent (within 24 hours), upcoming (more than 24 hours and up to 7 days), and future (more than 7 days).
+
+**Weighted grade calculation**
 
 ```text
 Weighted average = sum(grade × weight) / sum(weight)
 ```
 
-| Assessment | Grade | Weight |
-| --- | ---: | ---: |
-| Assignment | 7.00 | 2 |
-| Midterm exam | 8.00 | 3 |
-| Final exam | 9.00 | 1 |
-| Pending exam | Not graded | 4 |
+Grades range from 0 to 10 with up to two decimal places. Weights are integers from 1 to 10. Ungraded assessments are excluded from both sums, while a grade of zero is included. Results are rounded to two decimal places; a subject with no recorded grades returns `null`.
 
-The weighted average is `(7 × 2 + 8 × 3 + 9 × 1) / 6 = 7.83`.
+## Tech Stack
 
-- Grades range from 0 to 10, with up to two decimal places.
-- Weights must be integers between 1 and 10.
-- Ungraded assessments are excluded from both the numerator and denominator.
-- A grade of zero is valid and included in the calculation.
-- The service calculates using integer hundredths and rounds the result to two decimal places.
-- An existing subject without graded assessments returns JSON `null` with HTTP `200`.
-- An unavailable subject returns HTTP `404`.
+| Layer | Technology |
+| --- | --- |
+| Runtime | Node.js 24 |
+| Language | TypeScript, native ES modules |
+| Backend | Fastify 5, REST API |
+| Frontend | Vanilla TypeScript, HTML5, CSS3, Vite 8 |
+| Database | PostgreSQL 17 |
+| Data access | `pg` (node-postgres), connection pooling, parameterized SQL |
+| Database migrations | `node-pg-migrate` |
+| Validation | Zod 4, `fastify-type-provider-zod` |
+| Authentication | `@fastify/jwt`, Argon2id |
+| API documentation | OpenAPI, Swagger UI |
+| Testing | Node.js test runner, `tsx`, Fastify `app.inject()` |
+| Containerization | Docker, Docker Compose |
+| Continuous integration | GitHub Actions |
+| Cloud deployment | Render Web Service (Docker), Render PostgreSQL |
+| Version control | Git, GitHub |
 
-### Relational Database
+## Architecture
+
+AcademicHub uses a modular monolithic backend and a separate frontend source tree. In production, both application layers are packaged into a single Docker image: Fastify exposes the REST API and serves the compiled frontend. PostgreSQL runs as a separate service.
+
+```mermaid
+flowchart TD
+    U[Student / Browser] -->|HTTPS in production| F[Fastify HTTP server]
+    subgraph APP[Application container]
+        F --> W[Static Vite frontend]
+        F --> R[Versioned REST routes]
+        R --> V[Zod validation and JWT guards]
+        V --> S[Academic services]
+        S --> P[Repositories]
+        V --> A[Authentication routes]
+    end
+    P -->|Parameterized SQL| D[(PostgreSQL)]
+    A -->|Parameterized SQL| D
+```
+
+**Backend responsibilities**
+
+- Routes define HTTP contracts, validation schemas, authentication guards, and response handling.
+- Services coordinate domain operations and business rules, including weighted grade calculation.
+- Repositories handle SQL and ownership-scoped data access. Authentication routes currently query the database directly rather than using a separate service/repository layer.
+- `src/app.ts` constructs a Fastify application with an injected database pool and JWT secret. `src/server.ts` checks database connectivity and starts the HTTP listener.
+- `src/database/db.ts` configures a connection pool with a maximum of 10 connections and a 5-second connection timeout.
+
+**Frontend responsibilities**
+
+The web client uses hash-based routing, page renderers, reusable components, typed API services, an in-memory session module, and a shared Fetch client. It sends relative requests to `/api/v1`, allowing the production frontend and API to share a single origin. During development, Vite proxies `/api` requests to the local Fastify server.
+
+**Repository structure**
+
+```text
+academicHub/
+├── .github/workflows/ci.yml      # CI workflow
+├── migrations/                   # Versioned database schema changes
+├── scripts/start.sh              # Container startup and migrations
+├── src/                          # Backend
+│   ├── app.ts                    # Fastify application factory
+│   ├── server.ts                 # HTTP server entry point
+│   ├── config/                   # Environment validation
+│   ├── database/                 # PostgreSQL pool
+│   ├── modules/
+│   │   ├── auth/
+│   │   ├── subjects/
+│   │   ├── activities/
+│   │   └── assessments/
+│   └── types/                    # JWT type declarations
+├── tests/                        # Unit and integration tests
+│   └── helpers/                  # Shared integration fixtures
+├── web/                          # Vite frontend
+│   ├── src/
+│   │   ├── components/
+│   │   ├── core/                 # HTTP client and session
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── utils/
+│   └── vite.config.ts
+├── .env.example
+├── .env.test.example
+├── .dockerignore
+├── .gitignore
+├── .node-version
+├── compose.yaml
+├── Dockerfile
+├── package.json
+├── package-lock.json
+└── tsconfig.json
+```
+
+The backend build is written to `dist/`, and the frontend build is written to `web/dist/`.
+
+## Database Schema
+
+PostgreSQL stores users, subjects, activities, and assessments. Subjects belong to users; activities and assessments belong to subjects.
 
 ```mermaid
 erDiagram
@@ -581,132 +186,427 @@ erDiagram
     }
 ```
 
-Key database rules:
-
-- Email uniqueness is case-insensitive.
-- Subject names must be unique within a user's account.
-- Activities and assessments must reference an existing subject.
-- Foreign keys use `ON DELETE CASCADE`: deleting a subject also deletes its activities and assessments.
-- PostgreSQL constraints enforce valid activity statuses, assessment grades, and weights.
-- Database timestamps use `TIMESTAMPTZ`.
-
-The activities table stores the activity name in its `title` column, while the REST API exposes it as `name`.
-
-## Automated Testing
-
-The repository contains a weighted-grade unit test file and seven backend integration test files. Integration tests exercise the Fastify application with `app.inject()` and a real PostgreSQL database.
-
-| Suite | Scope |
+| Table | Main constraints |
 | --- | --- |
-| Unit | Weighted averages and grade calculation rules |
-| Authentication | Registration, login, duplicate email, and token validation |
-| Authorization | Ownership restrictions across academic records |
-| Subjects | CRUD, validation, and persistence |
-| Activities | Creation, validation, and ownership |
-| Assessments | Creation, validation, and deletion |
-| Grades | Weighted averages calculated from persisted records |
-| Deadlines | Outstanding deadlines and chronological ordering |
+| `users` | UUID primary key; case-insensitive unique email; role restricted to `user` or `admin`, defaulting to `user`; required password hash. |
+| `subjects` | Required user foreign key; unique subject name per user; optional description. |
+| `activities` | Required subject foreign key and due date; status constrained to the three supported values; optional description. |
+| `assessments` | Required subject foreign key and due date; nullable `NUMERIC(4,2)` grade constrained to 0–10; integer weight constrained to 1–10, defaulting to 1 at the database level. |
 
-### Run unit tests
+Foreign keys use `ON DELETE CASCADE`: deleting a user deletes their subjects and associated academic records, and deleting a subject deletes its activities and assessments. Indexes support foreign-key lookups and deadline queries. Date-time fields use `TIMESTAMPTZ`.
+
+The activities table stores the activity name as `title`; the REST API exposes it as `name`.
+
+The outstanding deadline list is derived from existing activities and assessments, rather than stored in a separate table.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 24 and npm (for native development and local tests).
+- Git.
+- Docker Engine or Docker Desktop with the Docker Compose plugin.
+- OpenSSL or another cryptographically secure random generator for the JWT secret.
+
+Commands assume a Bash-compatible terminal. For a fully containerized local environment, see [Docker](#docker).
+
+### Environment Variables
+
+Create a local `.env` from the tracked example after cloning the repository:
+
+```bash
+cp -n .env.example .env
+```
+
+| Variable | Purpose | Development example |
+| --- | --- | --- |
+| `POSTGRES_USER` | Initial PostgreSQL user for Compose | `academichub` |
+| `POSTGRES_PASSWORD` | Initial PostgreSQL password for Compose | `localDevPass123` |
+| `POSTGRES_DB` | Initial PostgreSQL database for Compose | `academichub` |
+| `DATABASE_URL` | PostgreSQL connection string for the backend and migrations | `postgresql://academichub:localDevPass123@127.0.0.1:5433/academichub` |
+| `JWT_SECRET` | JWT signing secret, at least 32 characters | Generate a unique value |
+| `PORT` | Fastify HTTP listening port | `3000` |
+| `TEST_DATABASE_URL` | Separate integration-test database connection | Configured in `.env.test` |
+| `NODE_ENV` | Runtime environment | `development` locally; `production` in the Docker runtime |
+
+Generate a JWT secret and insert it into `.env`:
+
+```bash
+openssl rand -hex 32
+chmod 600 .env
+```
+
+The example database password is for disposable local development only. Keep `POSTGRES_*` consistent with the local connection URL. Use URL-safe credentials or correctly percent-encode URL components where necessary. Existing PostgreSQL volumes retain their original credentials even if the environment file changes.
+
+> Never commit `.env`, `.env.test`, real connection strings, production secrets, or database dumps containing sensitive data.
+
+### Installation
+
+```bash
+git clone https://github.com/programmer977/academicHub.git
+cd academicHub
+
+npm ci
+npm --prefix web ci
+
+cp -n .env.example .env
+```
+
+Set `JWT_SECRET` and the database credentials as described above. The frontend and backend maintain independent npm manifests and lockfiles.
+
+### Database Migrations
+
+Start the local PostgreSQL service and wait for its healthcheck:
+
+```bash
+docker compose up -d --wait db
+```
+
+Apply migrations when running the backend directly on the host:
+
+```bash
+(
+  set -a
+  source .env
+  set +a
+  npm run migrate -- up
+)
+```
+
+The initial migration creates the four application tables, constraints, and indexes. `node-pg-migrate` tracks applied migrations so subsequent runs apply only pending changes.
+
+When using the application Docker image, `scripts/start.sh` runs migrations automatically before starting Fastify.
+
+### Running Locally
+
+For development with hot reload, leave PostgreSQL running in Docker and start the backend in a terminal at the repository root:
+
+```bash
+npm run dev
+```
+
+Start the Vite development server in a second terminal:
+
+```bash
+npm --prefix web run dev
+```
+
+| Service | Local address |
+| --- | --- |
+| Frontend | http://localhost:5173 |
+| REST API | http://localhost:3000/api/v1 |
+| Swagger UI | http://localhost:3000/docs |
+| Liveness | http://localhost:3000/health |
+| Readiness | http://localhost:3000/ready |
+| PostgreSQL | `127.0.0.1:5433` |
+
+If the API container is already running, stop it with `docker compose stop api` before starting the native backend on port 3000. If the backend port changes, adjust the Vite proxy in `web/vite.config.ts` accordingly.
+
+To compile and run the application without Vite's development server (after applying migrations):
+
+```bash
+npm run build
+npm --prefix web run build
+npm start
+```
+
+Fastify serves the compiled frontend at `http://localhost:3000` when `web/dist/` exists.
+
+## API Documentation
+
+**API base path:** `/api/v1`  
+**Interactive documentation:** `/docs` (OpenAPI / Swagger UI)
+
+The following resource paths are relative to `/api/v1`.
+
+| Method | Endpoint | Description | Authentication |
+| --- | --- | --- | --- |
+| `POST` | `/auth/register` | Register an account | Public |
+| `POST` | `/auth/login` | Obtain an access token | Public |
+| `GET` | `/auth/me` | Retrieve the authenticated profile | JWT |
+| `GET` | `/subjects` | List owned subjects | JWT |
+| `POST` | `/subjects` | Create a subject | JWT |
+| `GET` | `/subjects/:id` | Retrieve a subject | JWT |
+| `PATCH` | `/subjects/:id` | Update a subject | JWT |
+| `DELETE` | `/subjects/:id` | Delete a subject | JWT |
+| `GET` | `/subjects/:id/average` | Retrieve the weighted subject average | JWT |
+| `GET` | `/activities` | List activities | JWT |
+| `POST` | `/activities` | Create an activity | JWT |
+| `GET` | `/activities/:id` | Retrieve an activity | JWT |
+| `PATCH` | `/activities/:id` | Update an activity | JWT |
+| `DELETE` | `/activities/:id` | Delete an activity | JWT |
+| `GET` | `/assessments` | List assessments | JWT |
+| `POST` | `/assessments` | Create an assessment | JWT |
+| `GET` | `/assessments/:id` | Retrieve an assessment | JWT |
+| `PATCH` | `/assessments/:id` | Update an assessment | JWT |
+| `DELETE` | `/assessments/:id` | Delete an assessment | JWT |
+| `GET` | `/deadlines` | List outstanding deadlines in chronological order | JWT |
+
+Operational endpoints are outside the versioned API:
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/health` | Return HTTP 200 when the HTTP process responds. |
+| `GET` | `/ready` | Execute `SELECT 1`; return HTTP 200 when the database is reachable or HTTP 503 otherwise. |
+
+Resource IDs are UUIDs. Date-time inputs use ISO 8601 with a timezone offset or UTC `Z`.
+
+**Example: register, authenticate, and create a subject**
+
+```bash
+curl -i -X POST http://localhost:3000/api/v1/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Test Student","email":"student@example.com","password":"ExamplePassword123!"}'
+
+curl -i -X POST http://localhost:3000/api/v1/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"student@example.com","password":"ExamplePassword123!"}'
+```
+
+Copy the access token returned by the login endpoint:
+
+```bash
+TOKEN='<access-token>'
+
+curl -i -X POST http://localhost:3000/api/v1/subjects \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Computer Networks","description":"Networking fundamentals"}'
+```
+
+**Example assessment request body** for `POST /api/v1/assessments`:
+
+```json
+{
+  "subjectId": "<subject-uuid>",
+  "title": "Midterm exam",
+  "grade": 8.5,
+  "weight": 3,
+  "dueAt": "2027-04-10T09:00:00-03:00"
+}
+```
+
+Use `null` or omit `grade` for an ungraded assessment. Replace placeholder UUIDs with real subject IDs. Refer to Swagger UI for complete request and response schemas.
+
+## Authentication and Authorization
+
+Authentication is based on signed JSON Web Tokens. Passwords are hashed using Argon2id before storage. Email addresses are normalized, and registration requires passwords between 12 and 128 characters.
+
+1. The client submits credentials to `/api/v1/auth/login`.
+2. The backend verifies the stored password hash and signs a JWT containing the user ID (`sub`) and role.
+3. The client sends the token with protected requests using `Authorization: Bearer <access-token>`.
+4. Fastify verifies the token, and academic data access is scoped to the authenticated user.
+
+Access tokens expire after 15 minutes (900 seconds). The frontend stores its token in JavaScript memory, redirects unauthenticated users to the login page, and clears the session on logout or authenticated HTTP 401 responses.
+
+Authorization is enforced on the backend through ownership-scoped SQL queries, not merely through frontend route restrictions. The database and JWT payload support `user` and `admin` roles, but a dedicated administration interface and a broader role-based permission model are not implemented.
+
+Additional controls include Zod request validation, parameterized SQL, database constraints, and environment-based secret configuration. These provide a security foundation, not a guarantee of production security.
+
+## Testing
+
+AcademicHub uses the native Node.js test runner with `tsx`. Backend integration tests exercise Fastify through `app.inject()` and a real PostgreSQL database without requiring an HTTP listener.
+
+| Suite | Coverage |
+| --- | --- |
+| Unit (`grade.test.ts`) | Weighted averages, null grades, zero grades, boundary conditions, and invalid inputs. |
+| Authentication | Registration, login, duplicate email handling, and token validation. |
+| Authorization | Isolation of academic records between users. |
+| Subjects | CRUD, validation, and persistence. |
+| Activities | Creation, validation, and ownership. |
+| Assessments | Creation, validation, and deletion. |
+| Grades | Weighted averages derived from persisted records. |
+| Deadlines | Outstanding deadline aggregation and chronological ordering. |
+
+Run unit tests:
 
 ```bash
 npm run test:unit
 ```
 
-### Configure the integration test database
-
-Integration tests must target a separate database named `academichub_test`. The helper checks the database name before executing test operations.
-
-With the development database container running, create the test database once:
+Integration tests require a separate database named `academichub_test`. With the development PostgreSQL container running, create it once:
 
 ```bash
+docker compose up -d --wait db
+
 docker compose exec db psql -U academichub -d postgres \
   -c 'CREATE DATABASE academichub_test;'
+
+cp -n .env.test.example .env.test
 ```
 
-Use your configured PostgreSQL username if it differs from the example. Skip the creation command if the database already exists.
+Use your configured PostgreSQL username if different. Skip the database creation command if it already exists, and adjust `.env.test` to match your local credentials.
 
-Create and load the test environment file:
+Load the test environment, migrate the test database, and execute the suite:
 
 ```bash
-cp .env.test.example .env.test
-
-set -a
-source .env.test
-set +a
+(
+  set -a
+  source .env.test
+  set +a
+  DATABASE_URL="$TEST_DATABASE_URL" npm run migrate -- up &&
+    npm run test:integration
+)
 ```
 
-Ensure `TEST_DATABASE_URL` points to the test database, not the development database. Apply migrations specifically to the test database:
+The test helpers verify the database name before using it and clean up created test fixtures. Integration files execute sequentially to reduce interference. Never run these tests against production data.
+
+Additional validation commands:
 
 ```bash
-DATABASE_URL="$TEST_DATABASE_URL" npm run migrate -- up
+npm run typecheck
+npm run build
+npm --prefix web run build
 ```
 
-Then run the integration suite:
+The root `npm test` script is still a placeholder; use the explicit unit and integration commands. Automated browser and end-to-end tests are not yet implemented.
+
+## Docker
+
+The project includes a multi-stage `Dockerfile` and a `compose.yaml` defining two local services:
+
+| Service | Purpose | Published address |
+| --- | --- | --- |
+| `api` | Fastify API and compiled Vite frontend | `127.0.0.1:3000` |
+| `db` | PostgreSQL 17 with persistent storage | `127.0.0.1:5433` |
+
+The build stage installs dependencies and compiles both application layers. The runtime stage installs production backend dependencies, copies compiled artifacts and migrations, and runs as the non-root `node` user.
+
+From the repository root, with `.env` configured:
 
 ```bash
-npm run test:integration
+docker compose config --quiet
+docker compose up -d --build
+docker compose ps
+docker compose logs -f api
 ```
 
-Test fixtures are cleaned up by the integration test helper. The test runner executes integration files sequentially to reduce interference between suites.
+Open http://localhost:3000 for the application or http://localhost:3000/docs for Swagger UI.
 
-The previous project documentation reported a successful local integration run. Current pass counts are not asserted here because the suite must be rerun against the current revision to verify its status. Automated browser/end-to-end tests and a CI workflow are not yet included in the repository.
+The API depends on the PostgreSQL healthcheck and connects using the Compose service hostname `db:5432`. The published port `5433` is used only by clients running on the host, including native development and local migrations.
 
-## Security
+**Container startup:** the Dockerfile invokes `/bin/sh /app/scripts/start.sh`, which runs pending migrations and then starts `node dist/server.js` using `exec`. If migrations fail, the script exits instead of starting the application with an unprepared database.
 
-### Implemented Controls
+Useful lifecycle commands:
 
-- Argon2id password hashing; plaintext passwords are not stored.
-- JWT bearer authentication with a 15-minute access-token lifetime.
-- Server-side resource ownership checks, independent of frontend routing.
-- Parameterized SQL queries and relational constraints.
-- Zod validation of request payloads and route parameters.
-- Registration passwords between 12 and 128 characters.
-- Environment-based configuration with a minimum JWT secret length of 32 characters.
-- In-memory frontend token storage; no persistent token storage in `localStorage` or `sessionStorage`.
-- Session clearing on logout and authenticated `401` responses.
+| Command | Purpose |
+| --- | --- |
+| `docker compose up -d --build api` | Rebuild and recreate the application service. |
+| `docker compose logs --tail=50 db` | Inspect recent PostgreSQL logs. |
+| `docker compose stop` | Stop services without removing containers. |
+| `docker compose down` | Remove project containers and network while preserving the named database volume. |
 
-These controls provide an initial security foundation, not a guarantee of production security. Frontend route protection is a navigation mechanism; backend authorization remains the security boundary.
+PostgreSQL data is stored in the named `postgres_data` volume. **Do not use `docker compose down -v` unless you deliberately intend to delete the local database volume and its contents.**
+
+## Deployment
+
+AcademicHub has been successfully deployed to Render using a Docker Web Service and a separate managed PostgreSQL instance. The web service serves both the frontend and REST API over HTTPS; PostgreSQL is accessed through the Render private network.
+
+```mermaid
+flowchart LR
+    G[GitHub main branch] --> CI[GitHub Actions CI]
+    CI -->|Successful checks| R[Render Docker Web Service]
+    U[Browser] -->|HTTPS| R
+    R -->|Internal database URL| P[(Render PostgreSQL 17)]
+```
+
+**Render configuration**
+
+1. Create a managed PostgreSQL 17 database and a Docker Web Service in the same Render workspace and region.
+2. Connect the Web Service to `programmer977/academicHub` on the `main` branch.
+3. Use the repository root as the build context and `./Dockerfile` as the Dockerfile path. Leave Root Directory and Docker Command empty to use the image defaults.
+4. Set production environment variables through the Render dashboard; copy the database's **Internal Database URL** rather than using local credentials.
+5. Configure `/ready` as the health check path and select **After CI Checks Pass** for auto-deploys.
+6. Deploy and verify the frontend, authentication, database-backed operations, and operational endpoints.
+
+| Variable | Production value |
+| --- | --- |
+| `DATABASE_URL` | Internal Database URL generated by Render. |
+| `JWT_SECRET` | Unique cryptographically generated production secret. |
+| `NODE_ENV` | `production` |
+| `PORT` | `10000` (Render's default web service port). |
+
+The application binds to `0.0.0.0` and uses its environment-provided port. Migrations are executed by the container startup script before Fastify begins listening, so a separate paid pre-deploy command is not required for this deployment strategy. Docker Compose is used for local infrastructure; it is not needed to provision the Render database.
+
+Verify the deployment using the actual public service URL shown in the Render dashboard:
+
+```bash
+BASE_URL='https://<your-render-service>.onrender.com'
+curl -i "$BASE_URL/health"
+curl -i "$BASE_URL/ready"
+```
+
+The Swagger interface is available at `/docs` on the same domain. Both health endpoints should return HTTP 200 when the application and database are available. Readiness checks connectivity, not the completeness of the database schema.
+
+The free-tier deployment is intended for prototyping and demonstration. Free web services can spin down when idle, and free PostgreSQL instances expire after 30 days. Do not rely on this setup for durable real-user data without an appropriate database plan and a tested backup strategy.
+
+## CI Pipeline
+
+The workflow at [`.github/workflows/ci.yml`](.github/workflows/ci.yml) implements continuous integration for pushes and pull requests. It uses a GitHub-hosted Ubuntu runner, Node.js 24, and an isolated PostgreSQL 17 service container.
+
+The workflow runs the following checks in order:
+
+| Step | Command or action |
+| --- | --- |
+| Checkout | `actions/checkout@v6`, without persisted credentials |
+| Setup | `actions/setup-node@v6`, Node.js 24, npm cache for both lockfiles |
+| Backend dependencies | `npm ci` |
+| Frontend dependencies | `npm --prefix web ci` |
+| Type checking | `npm run typecheck` |
+| Unit tests | `npm run test:unit` |
+| Database migrations | `npm run migrate -- up` |
+| Integration tests | `npm run test:integration` |
+| Backend build | `npm run build` |
+| Frontend build | `npm --prefix web run build` |
+| Docker image build | `docker build -t academichub:ci .` |
+
+The job has read-only repository-content permissions and a 15-minute timeout. Its temporary `academichub_test` database is exposed to the runner at `127.0.0.1:5433` and uses dedicated disposable credentials. The PostgreSQL healthcheck ensures the service is available before the job steps begin.
+
+CI validates the code, database integration, and Docker image construction. Render handles deployment separately. The workflow does not publish an image to a registry or run a production-container smoke test.
+
+Check the live CI badge or the repository's Actions tab for the current run status.
+
+## Architectural Decisions
+
+| Decision | Rationale and trade-off |
+| --- | --- |
+| Modular monolith | Keeps deployment and development simple while maintaining domain boundaries. Independent service scaling is not currently required. |
+| Fastify with Zod | Integrates typed HTTP contracts, request validation, and OpenAPI documentation with minimal framework overhead. |
+| PostgreSQL and explicit SQL | Makes relational constraints, ownership, and queries visible; avoids an ORM abstraction but requires manual query and mapping maintenance. |
+| Application factory with dependency injection | Allows integration tests to construct the application with isolated database connections and test secrets. |
+| Backend-owned academic calculations | Keeps grade calculation consistent across clients and testable independently of UI code. |
+| Framework-free TypeScript frontend | Provides direct control over browser APIs and minimizes dependencies; component and state management require more manual implementation as the UI grows. |
+| Same-origin production hosting | Simplifies deployment and frontend-to-API communication without a separate CORS configuration for the bundled client. |
+| Short-lived JWTs and in-memory token storage | Avoids persistent browser token storage, at the cost of requiring reauthentication after expiration or page reload. |
+| Multi-stage Docker build and non-root runtime | Separates build tooling from production dependencies and reduces unnecessary runtime privileges. |
+| Versioned database migrations at startup | Ensures pending schema changes run before application startup; convenient for the current single-instance deployment, but a dedicated migration phase is preferable before horizontal scaling. |
+| Separate development, CI, and deployment configuration | Keeps test data isolated and secrets outside source code while reusing the same application implementation. |
+| CI-gated deployment | Separates automated validation from hosting and reduces the chance of publishing code that fails configured checks. |
 
 ## Known Limitations
 
-- **Session persistence:** Refreshing or closing the web page clears the in-memory token. Users must authenticate again after a reload or token expiration. Refresh tokens and server-side token revocation are not implemented; logout only clears the client session.
-- **Deadline aggregation:** The API returns a maximum of 50 outstanding entries, including overdue records. A large overdue backlog can reduce the number of upcoming deadlines available to the dashboard.
+- **Session lifecycle:** Tokens are lost on page reload and expire after 15 minutes. Refresh tokens and server-side revocation are not implemented; logout clears the local session only.
+- **Deadline aggregation:** The endpoint returns a maximum of 50 outstanding records, including overdue entries. Large overdue backlogs may hide later deadlines.
+- **Testing scope:** Backend unit and integration tests exist, but automated browser tests, end-to-end coverage, and production-container smoke tests are missing.
+- **Security hardening:** Dedicated rate limiting, comprehensive security headers, account recovery, and a broader authorization model are not implemented. The initial Render build also reported production dependency vulnerabilities that require a fresh audit and remediation; their current status is not asserted here.
+- **Operational readiness:** The readiness endpoint verifies database connectivity but not schema integrity. Structured logs and basic health endpoints exist, while dedicated monitoring, alerting, and automated recovery procedures remain future work.
+- **Hosting constraints:** Free-tier database expiration, limited resources, and web-service cold starts make the current deployment a demonstration environment rather than a high-availability production system.
+- **Migration strategy:** Startup migrations are suited to the current deployment, but should be separated from replica initialization as the system scales.
 
-## Development Roadmap
+## Future Improvements
 
-### Implemented foundations
-
-- [x] Modular TypeScript backend and PostgreSQL schema.
-- [x] Authentication, ownership checks, and API documentation.
-- [x] Subject, activity, and assessment CRUD endpoints.
-- [x] Weighted grade calculation and deadline aggregation.
-- [x] Backend unit and integration test suites.
-- [x] TypeScript/Vite frontend, API services, and hash-based router.
-- [x] Registration, login, and academic dashboard pages.
-- [x] Subject management and subject detail pages.
-- [x] Activity management with status filtering and completion actions.
-- [x] Assessment management and weighted average display.
-- [x] Deadline page with urgency classification.
-
-### Suggested next development priorities
-
-- [ ] Expand backend regression and authorization tests.
-- [ ] Add automated frontend and end-to-end tests.
-- [ ] Improve session lifecycle management and authentication hardening.
-- [ ] Improve dashboard aggregation, deadline pagination, and server-side filtering.
-- [ ] Standardize API error responses and improve accessibility.
-- [ ] Add CI checks for backend and frontend builds, type checking, and tests.
-- [ ] Configure production hosting, HTTPS, secret management, and monitoring.
-
-## Author and License
-
-Developed by **[programmer977](https://github.com/programmer977)**.
-
-Repository: [programmer977/academicHub](https://github.com/programmer977/academicHub).
-
-License declaration: **ISC**, as specified in the root `package.json`. A standalone `LICENSE` file is not currently present in the repository.
+- [ ] Improve authentication lifecycle with refresh tokens, revocation, and account recovery.
+- [ ] Audit and remediate dependency vulnerabilities; introduce automated dependency and security scanning.
+- [ ] Implement rate limiting, security headers, and additional abuse prevention on public authentication endpoints.
+- [ ] Expand regression, authorization, frontend, and end-to-end tests; add coverage reporting and container smoke tests.
+- [ ] Add deadline pagination, richer filtering, and more efficient server-side dashboard aggregation.
+- [ ] Improve frontend accessibility, responsive behavior, and user feedback.
+- [ ] Standardize API error responses and extend observability with metrics, alerts, and request tracing.
+- [ ] Configure branch protection and required CI checks before merging into `main`.
+- [ ] Establish automated database backups and validate recovery procedures before storing real-user data.
+- [ ] Define reproducible cloud infrastructure using a Render Blueprint (`render.yaml`).
+- [ ] Evaluate registry-based image distribution and a dedicated migration phase as deployment requirements grow.
 
 ---
 
-**Academic Hub — Organize your academic responsibilities. Track your progress. Understand your performance.**
+Developed by [programmer977](https://github.com/programmer977). The root `package.json` declares the ISC license; a standalone license file has not yet been added to the repository.

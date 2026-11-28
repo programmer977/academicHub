@@ -17,6 +17,7 @@ RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/web/dist ./web/dist
 COPY migrations ./migrations
+COPY scripts/start.sh ./scripts/start.sh
 USER node
 EXPOSE 3000
-CMD ["node", "dist/server.js"]
+CMD ["/bin/sh", "/app/scripts/start.sh"]

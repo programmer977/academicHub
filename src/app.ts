@@ -64,6 +64,11 @@ app.register(fastifySwaggerUi, {
     app.register(assessmentsRoutes(option.pool), {
     prefix: "/api/v1"
     });
+    app.get("/health", async () => {
+    return {
+        status: "ok"
+    };
+    });
     const frontendPath = fileURLToPath(
     new URL("../web/dist/", import.meta.url)
     );

@@ -8,6 +8,9 @@ import { authRoutes } from './modules/auth/auth.routes.js';
 import { subjectRoutes } from './modules/subjects/subjects.routes.js';
 import { activitiesRoutes } from "./modules/activities/activities.route.js";
 import { assessmentsRoutes } from "./modules/assessments/assessments.routes.js";
+import fastifyStatic from "@fastify/static";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 type appOption = {pool:Pool,jwtSecret:string};
 
@@ -61,6 +64,15 @@ app.register(fastifySwaggerUi, {
     app.register(assessmentsRoutes(option.pool), {
     prefix: "/api/v1"
     });
+    const frontendPath = fileURLToPath(
+    new URL("../web/dist/", import.meta.url)
+    );
+    if (existsSync(frontendPath)) {
+    app.register(fastifyStatic, {
+        root: frontendPath,
+        prefix: "/"
+    });
+    }
 
 
     app.setErrorHandler((error,request,reply)=>{

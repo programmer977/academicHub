@@ -49,8 +49,8 @@ export function buildApp(option:appOption){
             },
         transform: jsonSchemaTransform
     });
-app.register(fastifySwaggerUi, {
-    routePrefix: "/docs"
+    app.register(fastifySwaggerUi, {
+        routePrefix: "/docs"
     });
     app.register(authRoutes(option.pool), {
     prefix: "/api/v1/auth"
@@ -68,6 +68,20 @@ app.register(fastifySwaggerUi, {
     return {
         status: "ok"
     };
+    });
+    app.get("/ready", async (request, reply) => {
+    try {
+        await option.pool.query("SELECT 1");
+        return reply.code(200).send({
+            status: "ready"
+        });
+    } catch (error) {
+        request.log.error(error);
+
+        return reply.code(503).send({
+            status: "unavailable"
+        });
+    }
     });
     const frontendPath = fileURLToPath(
     new URL("../web/dist/", import.meta.url)
